@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-marine-report/
+<!-- marine-report/
 ├── app/
 │   ├── layout.tsx                 # Root layout (with ClerkProvider)
 │   ├── page.tsx                   # Landing page with login options
@@ -18,7 +18,7 @@ marine-report/
 │   └── schema.prisma
 ├── types/                         # TypeScript types
 ├── middleware.ts                  # Clerk middleware
-├── .env
+├── .env -->
 
 
 First, run the development server:
