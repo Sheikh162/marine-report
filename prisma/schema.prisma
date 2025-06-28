@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+  //output = "../../node_modules/.prisma/client"
+
+}
+
+generator zod {
+  provider = "prisma-zod-generator"
+  output   = "./zod"
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Report {
+  id           String   @id @default(uuid())
+  shipName     String
+  imoNumber    String
+  incidentDate DateTime
+  reportedAt   DateTime
+
+  dpaName      String
+  dpaPhone     String
+  dpaMobile    String
+  dpaEmail     String
+
+  userId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  mediaUrls    String[] // stored in s3
+
+  flag         String?
+  shipType     String?
+  registrationType String?
+  positionOfVessel String?
+  locationOfVessel String? // At Sea / In Port
+  areaOfIncident String?
+  yearBuilt    Int?
+  deadweight   String?
+  gt           String?
+  maxDraft     String?
+  classificationSociety String?
+  piClub       String?
+
+  hullMachineryUnderwriters String?
+  totalCrewOnBoard Int?
+  conditionLoadedBallast String? // Loaded, Partly loaded, Ballast
+  severityOfIncident String?
+
+  lastPortOfCall String?
+  freeboard      String?
+  cargoTypeQty   String?
+  bunkers        String?
+  ownershipType  String?
+
+  techManagerName String?
+  techManagerAddress String?
+  techManagerPhone String?
+  techManagerEmail String?
+
+  rpsAgencyName String?
+  rpsAgencyContactName String?
+  rpsAgencyPhone String?
+  rpsAgencyEmail String?
+
+  localAgencyName String?
+  localAgencyContactName String?
+  localAgencyPhone String?
+  localAgencyEmail String?
+
+  incidentCategory String?
+  incidentConsequences String?
+
+  deaths         Int?
+  injured        Int?
+  deceasedDetails String?
+
+  summaryIncident  String?
+  summaryAction    String?
+  lessonsLearnt    String?
+
+  sarRequired      String?
+  oilPollutionExtent String?
+  weatherConditions String?
+  tidalConditions   String?
+  oilSpilledVolume  String?
+
+}
