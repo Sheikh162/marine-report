@@ -1,40 +1,54 @@
-import { clerkClient,clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server';
-//import { auth } from '@clerk/nextjs/server';
+import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)','/'])
-const isAdminRoutes = createRouteMatcher(['/admin(.*)']);
-
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/unauthorized',
+])
+const isAdminRoute = createRouteMatcher(['/admin(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId, redirectToSignIn } = await auth()
 
+  // Not signed in and accessing protected route
   if (!userId && !isPublicRoute(req)) {
-    // Add custom logic to run before redirecting
     return redirectToSignIn()
-  }else if(userId && !isPublicRoute(req)){
+  }
+
+  // Signed in
+  if (userId) {
     const client=await clerkClient()
     const user = await client.users.getUser(userId)
-    const role = user.publicMetadata?.role;
-    //console.log(user.publicMetadata)
+    const role = user.publicMetadata?.role
 
-    // Authorize admin routes
-    if (isAdminRoutes(req)) {
-        if (role !== 'admin') {
-            console.warn(`Unauthorized admin access attempt by ${userId}`);
-            return NextResponse.redirect(
-              new URL('/unauthorized?code=403', req.url)
-            );
-        }
-    } 
+    // 🚫 Block non-admins from admin routes
+    if (isAdminRoute(req) && role !== 'admin') {
+      console.warn(`Unauthorized admin access attempt by ${userId}`)
+      return NextResponse.redirect(new URL('/unauthorized', req.url))
+    }
+
+    // ✅ Optional: Redirect admins from root `/` to `/admin`
+    if (req.nextUrl.pathname === '/' && role === 'admin') {
+      return NextResponse.redirect(new URL('/admin', req.url))
+    }
+
+    // ✅ Optional: Redirect users from root `/` to `/user/dashboard`
+    if (req.nextUrl.pathname === '/' && role !== 'admin') {
+      return NextResponse.redirect(new URL('/user/dashboard', req.url))
+    }
   }
+
+  // Allow if none of the above matched
+  return NextResponse.next()
 })
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
+    // Skip static files and Next internals
+    '/((?!_next|[^?]*\\.(?:html?|css|js|json|jpg|jpeg|png|gif|svg|woff2?|ttf|ico|txt|xml|webmanifest|map)).*)',
+    // Always run for API and app routes
     '/(api|trpc)(.*)',
   ],
 }

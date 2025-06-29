@@ -16,7 +16,8 @@ export default function UserDashboard() {
 
   useEffect(() => {
     const fetchReports = async () => {
-      const res = await axios.get('/api/reports?userId=user-001'); // Replace with dynamic user ID when ready
+      const res = await axios.get('/api/me/reports?userId=user-001'); // Replace with dynamic user ID when ready
+      // why queryparameter? because need the report of only that user, not everyone
       setReports(res.data);
     };
 
