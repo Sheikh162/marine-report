@@ -1,63 +1,48 @@
-import { prisma } from '@/lib/prisma'
-import { NextResponse } from 'next/server'
+// ✅ me/reports/[id]/route.ts
+import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 import { reportSchema } from '@/types';
+import { auth } from '@clerk/nextjs/server';
 
-// in this endpoint, get all the reports submitted by the particular user
+export async function GET(_: Request, { params }: { params: { id: string } }) {
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-/* 
-/api/me/reports            // GET, POST
-/api/me/reports/:id        // GET, PUT
+  const report = await prisma.report.findFirst({
+    where: { id: params.id, userId },
+  });
 
-*/  
-
-export async function GET(request:Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-
-    const reports = await prisma.report.findMany({
-      where:userId?{userId}:undefined
-    });  // Fetch all records
-    console.log(reports)
-    return NextResponse.json(reports);  // Return the records in the response
-  } catch (error) {
-    console.error("Error fetching reports:", error);
-    return NextResponse.json({ error: "Failed to fetch records" }, { status: 500 });
-  }
+  if (!report) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json(report);
 }
 
-   
-  //ill get the report here from frontend, and then have to put it in backend.
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  export async function PUT(request: Request) {
-    // Parse the request body
-    const body = await request.json();
-    console.log('📦 Received in API:', body);
-    const {data,success}=reportSchema.safeParse(body)
-    if(!success){
-        return NextResponse.json({
-            msg:"schema not validated"
-        })
-    }
-    const newReport=await prisma.report.create({
-        data: {
-            ...data,
-            incidentDate: new Date(data.incidentDate),
-            reportedAt: new Date(data.reportedAt),
-            //userId: data.userId, // ← Add this when using clerk
-          },
-    })
-   
-    return NextResponse.json(newReport);
+  const body = await request.json();
+  const parsed = reportSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
   }
 
+  const existing = await prisma.report.findFirst({
+    where: { id: params.id, userId },
+  });
 
+  if (!existing) {
+    return NextResponse.json({ error: 'Not allowed' }, { status: 403 });
+  }
 
+  const updated = await prisma.report.update({
+    where: { id: params.id },
+    data: {
+      ...parsed.data,
+      incidentDate: new Date(parsed.data.incidentDate),
+      reportedAt: new Date(parsed.data.reportedAt),
+    },
+  });
 
-
-
-
-
-  
-  
-  
+  return NextResponse.json(updated);
+}

@@ -35,7 +35,7 @@ export default function ReportsPage() {
     const fetchData = async () => {
       try {
         // Replace with actual API call
-        const response = await axios.get('/api/reports');
+        const response = await axios.get('/api/admin/reports');
         // setIncidents(response.data);
         
         // Mock data based on your screenshot

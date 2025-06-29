@@ -1,11 +1,8 @@
+// ✅ admin/reports/route.ts
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/clerk';
 
 export async function GET(req: Request) {
-  const { role } = getAuthUser();
-  if (role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
   const { searchParams } = new URL(req.url);
   const category = searchParams.get('category');
 
@@ -14,5 +11,16 @@ export async function GET(req: Request) {
     orderBy: { createdAt: 'desc' },
   });
 
+  return NextResponse.json(reports);
+}
+
+export async function POST(req: Request) {
+  const data = await req.json();
+
+  if (!Array.isArray(data)) {
+    return NextResponse.json({ error: 'Expected an array for bulk import' }, { status: 400 });
+  }
+
+  const reports = await prisma.report.createMany({ data });
   return NextResponse.json(reports);
 }

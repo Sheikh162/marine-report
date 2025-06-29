@@ -1,16 +1,16 @@
-// File: api/me/reports/route.ts
+// ✅ me/reports/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { reportSchema } from '@/types';
-import { auth } from '@/lib/auth'; // hypothetical auth util
+import { auth } from '@clerk/nextjs/server';
 
-export async function GET(request: Request) {
-  const user = await auth(request);
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function GET() {
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const reports = await prisma.report.findMany({
-      where: { userId: user.id },
+      where: { userId },
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(reports);
@@ -21,8 +21,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const user = await auth(request);
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const body = await request.json();
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     const report = await prisma.report.create({
       data: {
         ...data,
-        userId: user.id,
+        userId,
         incidentDate: new Date(data.incidentDate),
         reportedAt: new Date(data.reportedAt),
       },
