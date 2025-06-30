@@ -10,11 +10,6 @@ generator client {
   //output = "../../node_modules/.prisma/client"
 }
 
-generator zod {
-  provider = "prisma-zod-generator"
-  output   = "./zod"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -35,7 +30,8 @@ model Report {
   userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  mediaUrls String[] // stored in s3
+
+  mediaUrls String[] @default([])
 
   flag                  String?
   shipType              String?
@@ -93,3 +89,113 @@ model Report {
   tidalConditions    String?
   oilSpilledVolume   String?
 }
+
+/**
+ * model Report {
+ * // Core Identifiers
+ * id           String     @id @default(uuid())
+ * userId       String
+ * createdAt    DateTime   @default(now())
+ * updatedAt    DateTime   @updatedAt
+ * status       ReportStatus @default(DRAFT)
+ * // Ship Information
+ * shipName     String
+ * imoNumber    String     @unique
+ * flag         String?
+ * shipType     String?
+ * registrationType String?
+ * classificationSociety String?
+ * yearBuilt    Int?
+ * deadweight   Float?
+ * gt           Float?
+ * maxDraft     Float?
+ * piClub       String?
+ * // Incident Details
+ * incidentDate DateTime
+ * incidentCategory IncidentCategory?
+ * severity     IncidentSeverity?
+ * locationOfVessel VesselLocation? // At Sea/In Port
+ * areaOfIncident String?
+ * positionOfVessel String? // Consider GeoJSON if needed later
+ * weatherConditions String?
+ * tidalConditions   String?
+ * // Vessel Condition
+ * conditionLoadedBallast VesselCondition? // Loaded/Partly loaded/Ballast
+ * totalCrewOnBoard Int?
+ * lastPortOfCall String?
+ * freeboard      Float?
+ * cargoTypeQty   String?
+ * bunkers        String?
+ * // Consequences
+ * deaths        Int?      @default(0)
+ * injured       Int?      @default(0)
+ * deceasedDetails String?
+ * oilPollutionExtent String?
+ * oilSpilledVolume  String?
+ * sarRequired   Boolean?  @default(false)
+ * // Narrative
+ * summaryIncident  String?
+ * summaryAction    String?
+ * lessonsLearnt    String?
+ * incidentConsequences String?
+ * // DPA Information
+ * dpaName      String
+ * dpaPhone     String
+ * dpaMobile    String
+ * dpaEmail     String  @validate("email")
+ * // Management Contacts
+ * techManagerName String?
+ * techManagerAddress String?
+ * techManagerPhone String?
+ * techManagerEmail String? @validate("email")
+ * // Agency Information
+ * rpsAgencyName String?
+ * rpsAgencyContactName String?
+ * rpsAgencyPhone String?
+ * rpsAgencyEmail String? @validate("email")
+ * localAgencyName String?
+ * localAgencyContactName String?
+ * localAgencyPhone String?
+ * localAgencyEmail String? @validate("email")
+ * // Media & Metadata
+ * mediaUrls    String[]   // S3 URLs
+ * reportedAt   DateTime   @default(now())
+ * // Enums (defined below)
+ * }
+ * // ENUM DEFINITIONS
+ * enum ReportStatus {
+ * DRAFT
+ * SUBMITTED
+ * UNDER_REVIEW
+ * APPROVED
+ * REJECTED
+ * }
+ * enum IncidentCategory {
+ * COLLISION
+ * GROUNDING
+ * FIRE
+ * EXPLOSION
+ * FLOODING
+ * MACHINERY_FAILURE
+ * POLLUTION
+ * PERSONNEL_INJURY
+ * PIRACY
+ * OTHER
+ * }
+ * enum IncidentSeverity {
+ * MINOR
+ * MODERATE
+ * MAJOR
+ * CATASTROPHIC
+ * }
+ * enum VesselLocation {
+ * AT_SEA
+ * IN_PORT
+ * ANCHORED
+ * }
+ * enum VesselCondition {
+ * LOADED
+ * PARTLY_LOADED
+ * BALLAST
+ * }
+ */

@@ -4,8 +4,10 @@ import { reportSchema } from '@/types';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
-export default async function UserSingleReportPage({ params }: { params: { id: string } }) {
-  const report = await prisma.report.findUnique({ where: { id: params.id } });
+export default async function UserSingleReportPage(props: { params: { reportId: string } }) {
+  const params=await props.params
+  const reportId=params.reportId
+  const report = await prisma.report.findUnique({ where: { id: reportId } });
 
   if (!report) return notFound();
   const validatedReport = reportSchema.parse(report);
@@ -30,7 +32,7 @@ export default async function UserSingleReportPage({ params }: { params: { id: s
       </div>
 
       <div className="mt-6">
-        <Link href={`/user/dashboard/${params.id}/edit`}>
+        <Link href={`/user/dashboard/${params.reportId}/edit`}>
           <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
             Edit
           </button>

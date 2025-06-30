@@ -1,23 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import z from 'zod';
 import { reportSchema } from '@/types';
 import { useRouter } from 'next/navigation';
-// import { useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 
 type ReportInput = z.input<typeof reportSchema>;
 
 export default function UserDashboard() {
+  const { user }=useUser()
+  console.log(user?.id)
   const router = useRouter();
   const [reports, setReports] = useState<ReportInput[]>([]);
 
   useEffect(() => {
     const fetchReports = async () => {
-      const res = await axios.get('/api/me/reports?userId=user-001'); // Replace with dynamic user ID when ready
-      // why queryparameter? because need the report of only that user, not everyone
+      const res = await axios.get(`/api/me/reports?userId=${user?.id}`); // why query parameter? because need the report of only that user, not everyone
       setReports(res.data);
     };
 
