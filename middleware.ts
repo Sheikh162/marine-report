@@ -23,10 +23,9 @@ export default clerkMiddleware(async (auth, req) => {
     const user = await client.users.getUser(userId)
     const role = user.publicMetadata?.role
 
-    // 🚫 Block non-admins from admin routes
+    // 🚫 Block non-admins from admin routes, redirect them to user dashboard
     if (isAdminRoute(req) && role !== 'admin') {
-      console.warn(`Unauthorized admin access attempt by ${userId}`)
-      return NextResponse.redirect(new URL('/unauthorized', req.url))
+      return NextResponse.redirect(new URL('/user/dashboard', req.url))
     }
 
     // ✅ Optional: Redirect admins from root `/` to `/admin`
@@ -52,3 +51,11 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 }
+
+
+/* 
+think of all the edge cases of prevention and redirecting.
+
+admin, user routes both are blocked for users who havnt signed in
+lets say a user tries to sign in to the admin i.e blocked route, redirect them to user/dashboard
+*/

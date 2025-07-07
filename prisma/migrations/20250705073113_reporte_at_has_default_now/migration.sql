@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Report" ALTER COLUMN "reportedAt" SET DEFAULT CURRENT_TIMESTAMP;

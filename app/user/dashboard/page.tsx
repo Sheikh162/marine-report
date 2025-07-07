@@ -1,6 +1,14 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+/* 
+logic to implement here:
+loading state,
+
+when the fetcing is happening, render loading
+*/
+
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import z from 'zod';
@@ -8,18 +16,21 @@ import { reportSchema } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 
-type ReportInput = z.input<typeof reportSchema>;
+type ReportInput = z.infer<typeof reportSchema>;
 
 export default function UserDashboard() {
+  const router = useRouter();
   const { user }=useUser()
   console.log(user?.id)
-  const router = useRouter();
   const [reports, setReports] = useState<ReportInput[]>([]);
+  const [loading, setLoading] =useState<Boolean>(true)
 
   useEffect(() => {
     const fetchReports = async () => {
-      const res = await axios.get(`/api/me/reports?userId=${user?.id}`); // why query parameter? because need the report of only that user, not everyone
-      setReports(res.data);
+      const res = await axios.get(`/api/me/reports`); // do i need to send user id here or not as req.param? can backend extract it
+      console.log(res.data)
+      if(res.data.length>0) setReports(res.data);
+      setLoading(false)    
     };
 
     fetchReports();
@@ -46,23 +57,21 @@ export default function UserDashboard() {
             </tr>
           </thead>
           <tbody>
-            {reports.map((report) => (
-              <tr
-                key={report.id}
-                className="hover:bg-blue-50 transition cursor-pointer"
-                onClick={() => router.push(`/user/dashboard/${report.id}`)}
-              >
-                <td className="px-4 py-3 border-b">{report.shipName}</td>
-                <td className="px-4 py-3 border-b">{report.incidentCategory}</td>
-              </tr>
-            ))}
-            {reports.length === 0 && (
+            {loading?"loading":reports.length===0?   
               <tr>
                 <td colSpan={3} className="text-center px-4 py-6 text-gray-600">
                   No reports found.
                 </td>
-              </tr>
-            )}
+              </tr>:reports.map((report) =>
+               (<tr
+                  key={report.id}
+                  className="hover:bg-blue-50 transition cursor-pointer"
+                  onClick={() => router.push(`/user/dashboard/${report.id}`)}
+                >
+                  <td className="px-4 py-3 border-b">{report.shipName}</td>
+                  <td className="px-4 py-3 border-b">{report.incidentCategory}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

@@ -1,8 +1,9 @@
 // ✅ me/reports/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { reportSchema } from '@/types';
+import { reportSchema,sanitizeForPrisma } from '@/types';
 import { auth } from '@clerk/nextjs/server';
+import { Prisma } from '@prisma/client';
 
 // get all the reports of that specific user
 export async function GET() {
@@ -13,6 +14,9 @@ export async function GET() {
     const reports = await prisma.report.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+      include:{
+        casualties:true
+      }
     });
     return NextResponse.json(reports);
   } catch (error) {
@@ -21,37 +25,34 @@ export async function GET() {
   }
 }
 
-// post a single new report
-export async function POST(request: Request) {
-  console.log("verified")
+
+
+export async function POST(request: Request) {  // new single report to be created
   try {
     const body = await request.json();
     const parsed = reportSchema.safeParse(body);
+
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
+      return NextResponse.json({ error: "Invalid data" }, { status: 400 });
     }
 
-    const data = parsed.data;
-    console.log(data)
+    const safeData = sanitizeForPrisma(parsed.data); // sanitize before anytype of creation , updation i.e whenever going to add data
+
+    // Extract casualties and remove from safeData
+    const { casualties = [], ...reportData } = safeData
+
     const report = await prisma.report.create({
       data: {
-        ...data,
-        incidentDate: new Date(data.incidentDate),
-        reportedAt: new Date(data.reportedAt),
+        ...reportData,
+        casualties: {
+          create: casualties, 
+        },
       },
     });
 
     return NextResponse.json(report);
-
   } catch (err) {
-    console.error('POST /me/reports error:', err);
-    return NextResponse.json({ error: 'Failed to create report' }, { status: 500 });
+    console.error("POST /me/reports error:", err);
+    return NextResponse.json({ error: "Failed to create report" }, { status: 500 });
   }
 }
-
-
-/* 
-in my frontend also imm sending userId and in my backend also im using userId which is wrong
-
-also when converting to string after json.stringify, is probably why we get that error
-*/

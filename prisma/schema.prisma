@@ -1,14 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
-  //output = "../../node_modules/.prisma/client"
-
 }
 
 datasource db {
@@ -17,203 +9,140 @@ datasource db {
 }
 
 model Report {
-  id           String   @id @default(uuid())
-  shipName     String
-  imoNumber    String
-  incidentDate DateTime
-  reportedAt   DateTime
+  id                      String     @id @default(uuid())
+  userId                  String
+  createdAt               DateTime   @default(now()) @db.Timestamptz
+  updatedAt               DateTime   @updatedAt @db.Timestamptz
 
-  dpaName      String
-  dpaPhone     String
-  dpaMobile    String
-  dpaEmail     String
+  incidentClassification  String?  // for broad classification
+  reportedAt              DateTime   @default(now()) @db.Timestamptz
+  incidentDate            DateTime
+  shipName                String
+  imoNumber               String
 
-  userId       String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  flag                    String
+  shipType                String
+  registrationType        String?
+  positionOfVessel        String
+  locationOfVessel        String
+  areaOfIncident          String?
+  // textbox if outside indian ez do later
 
-  mediaUrls    String[] @default([])
+  deadweight              String?
+  yearBuilt               Int?
+  gt                      String
 
-  flag         String?
-  shipType     String?
-  registrationType String?
-  positionOfVessel String?
-  locationOfVessel String? // At Sea / In Port
-  areaOfIncident String?
-  yearBuilt    Int?
-  deadweight   String?
-  gt           String?
-  maxDraft     String?
-  classificationSociety String?
-  piClub       String?
+  draftBefore             String?
+  draftAft                String?
+  freeboard               String?
 
+  cargoTypeQty            String
+  bunkers                 String?
+  classificationSociety   String
+  lastPortOfCall          String
+  nextPortOfCall          String
+
+  piClub                  String
   hullMachineryUnderwriters String?
-  totalCrewOnBoard Int?
-  conditionLoadedBallast String? // Loaded, Partly loaded, Ballast
-  severityOfIncident String?
 
-  lastPortOfCall String?
-  freeboard      String?
-  cargoTypeQty   String?
-  bunkers        String?
-  ownershipType  String?
+  conditionLoadedBallast  String?
+  totalCrewOnBoard        Int
 
-  techManagerName String?
-  techManagerAddress String?
-  techManagerPhone String?
-  techManagerEmail String?
+  ownershipType           String?
+  techManagerName         String
+  techManagerAddress      String?
+  techManagerPhone        String
+  techManagerEmail        String
 
-  rpsAgencyName String?
-  rpsAgencyContactName String?
-  rpsAgencyPhone String?
-  rpsAgencyEmail String?
+  dpaName                 String
+  dpaPhone                String
+  dpaMobile               String
+  dpaEmail                String
 
-  localAgencyName String?
-  localAgencyContactName String?
-  localAgencyPhone String?
-  localAgencyEmail String?
+  rpsAgencyName           String?
+  rpsAgencyAddress        String?
+  rpsAgencyPhone          String?
+  rpsAgencyEmail          String?
 
-  incidentCategory String?
-  incidentConsequences String?
+  rpsAgencyContactName    String?
+  rpsAgencyContactPhone   String?
+  rpsAgencyContactEmail   String?
 
-  deaths         Int?
-  injured        Int?
-  deceasedDetails String?
+  rpslNumber              String?
+  localAgencyName         String?
+  localAgencyAddress      String?
+  localAgencyPhone        String?
+  localAgencyEmail        String?
+  localAgencyContactName  String?
+  localAgencyContactPhone String?
+  localAgencyContactEmail String?
 
-  summaryIncident  String?
-  summaryAction    String?
-  lessonsLearnt    String?
+  severityOfIncident      String?
+  incidentCategory        String
+  incidentConsequences    String[]
 
-  sarRequired      String?
-  oilPollutionExtent String?
-  weatherConditions String?
-  tidalConditions   String?
-  oilSpilledVolume  String?
+  deaths                  Int
+  injured                 Int
+  sickness                Int?
+  desertion               Int?
+  manOverboardSurvived    Int?
 
+  causalFactors           String?
+  summaryIncident         String?
+  summaryAction           String?
+  lessonsLearnt           String?
+
+  sarRequired             Boolean?
+  oilPollutionExtent      String?
+  oilSpilledVolume        String?
+  weatherConditions       String?
+  tidalConditions         String?
+
+  reportedBy              String
+  companyName             String
+  designation             String
+  contactNumber           String
+  lastUpdatedBy           String?
+  lastUpdatedAt           DateTime? @db.Timestamptz
+
+  mediaUrls               String[]   @default([])
+
+  casualties              Casualty[]
 }
 
-/* 
-model Report {
-  // Core Identifiers
-  id           String     @id @default(uuid())
-  userId       String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  status       ReportStatus @default(DRAFT)
+model Casualty {
+  id                      String     @id @default(uuid())
+  reportId                String
+  report                  Report     @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  createdAt               DateTime   @default(now()) @db.Timestamptz
+  updatedAt               DateTime   @updatedAt @db.Timestamptz
 
-  // Ship Information
-  shipName     String
-  imoNumber    String     @unique
-  flag         String?
-  shipType     String?
-  registrationType String?
-  classificationSociety String?
-  yearBuilt    Int?
-  deadweight   Float?
-  gt           Float?
-  maxDraft     Float?
-  piClub       String?
+  incidentSubCategory     String
+  name                    String
+  status                  String
+  nationality             String
+  residentialAddress      String?
+  dateOfBirth             DateTime?
+  age                     Int?
+  rank                    String?
+  dateOfJoining           DateTime?
 
-  // Incident Details
-  incidentDate DateTime
-  incidentCategory IncidentCategory?
-  severity     IncidentSeverity?
-  locationOfVessel VesselLocation? // At Sea/In Port
-  areaOfIncident String?
-  positionOfVessel String? // Consider GeoJSON if needed later
-  weatherConditions String?
-  tidalConditions   String?
-  
-  // Vessel Condition
-  conditionLoadedBallast VesselCondition? // Loaded/Partly loaded/Ballast
-  totalCrewOnBoard Int?
-  lastPortOfCall String?
-  freeboard      Float?
-  cargoTypeQty   String?
-  bunkers        String?
+  maritalStatus           String?
+  gender                  String
+  education               String?
 
-  // Consequences
-  deaths        Int?      @default(0)
-  injured       Int?      @default(0)
-  deceasedDetails String?
-  oilPollutionExtent String?
-  oilSpilledVolume  String?
-  sarRequired   Boolean?  @default(false)
-
-  // Narrative
-  summaryIncident  String?
-  summaryAction    String?
-  lessonsLearnt    String?
-  incidentConsequences String?
-
-  // DPA Information
-  dpaName      String
-  dpaPhone     String
-  dpaMobile    String
-  dpaEmail     String  @validate("email")
-
-  // Management Contacts
-  techManagerName String?
-  techManagerAddress String?
-  techManagerPhone String?
-  techManagerEmail String? @validate("email")
-
-  // Agency Information
-  rpsAgencyName String?
-  rpsAgencyContactName String?
-  rpsAgencyPhone String?
-  rpsAgencyEmail String? @validate("email")
-
-  localAgencyName String?
-  localAgencyContactName String?
-  localAgencyPhone String?
-  localAgencyEmail String? @validate("email")
-
-  // Media & Metadata
-  mediaUrls    String[]   // S3 URLs
-  reportedAt   DateTime   @default(now())
-
-  // Enums (defined below)
+  insuranceCover          String?
+  cdcNumber               String?
+  cdcPlaceOfIssue         String?
+  passportNumber          String?
+  passportPlaceOfIssue    String?
+  indosNumber             String?
+  cocNumber               String?
+  cocIssueDate            DateTime?
+  cocPlaceOfIssue         String?
+  maritimeTraining        String?
+  collectiveBargaining    String?
+  nextOfKinDetails        String?
+  medicalReports          String?
+  mortalRemainsStatus     String?
 }
-
-// ENUM DEFINITIONS
-enum ReportStatus {
-  DRAFT
-  SUBMITTED
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-}
-
-enum IncidentCategory {
-  COLLISION
-  GROUNDING
-  FIRE
-  EXPLOSION
-  FLOODING
-  MACHINERY_FAILURE
-  POLLUTION
-  PERSONNEL_INJURY
-  PIRACY
-  OTHER
-}
-
-enum IncidentSeverity {
-  MINOR
-  MODERATE
-  MAJOR
-  CATASTROPHIC
-}
-
-enum VesselLocation {
-  AT_SEA
-  IN_PORT
-  ANCHORED
-}
-
-enum VesselCondition {
-  LOADED
-  PARTLY_LOADED
-  BALLAST
-}
- */

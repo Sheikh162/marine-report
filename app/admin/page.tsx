@@ -7,7 +7,7 @@ import z from 'zod';
 import { useRouter } from 'next/navigation';
 
 
-type ReportInput = z.input<typeof reportSchema>; // raw data from backend
+type ReportInput = z.infer<typeof reportSchema>; // raw data from backend
 
 export default function ReportsPage() {
   const router=useRouter()

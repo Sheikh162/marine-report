@@ -1,554 +1,399 @@
-// implement with react hook form and fix the api also
-'use client';
-
-/* import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import axios from 'axios';
-import { reportSchema } from '@/types';
-import z from 'zod'; */
-
-//type ReportInput = z.infer<typeof reportSchema>; //z.infer or z.input?
-
-/* export default function EditReportPage() {
-  const params = useParams();
-  const router = useRouter();
-  const reportId = params.id as string;
-
-  const [formData, setFormData] = useState<Partial<ReportInput>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    const fetchReport = async () => {
-      try {
-        const res = await axios.get(`/api/reports/${reportId}`);
-        setFormData(res.data);
-      } catch (error) {
-        console.error('Error fetching report:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReport();
-  }, [reportId]);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      await axios.put(`/api/reports/${reportId}`, formData);
-      router.push(`/user/dashboard/${reportId}`);
-    } catch (error) {
-      console.error('Error updating report:', error);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) return <div className="p-6 text-black">Loading...</div>;
-
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-2xl border border-blue-100">
-      <h1 className="text-3xl font-semibold mb-6 text-black">Edit Report</h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-black mb-1">Ship Name</label>
-          <input
-            name="shipName"
-            value={formData.shipName || ''}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-blue-200 rounded-xl bg-blue-50 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-black mb-1">Incident Category</label>
-          <input
-            name="incidentCategory"
-            value={formData.incidentCategory || ''}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-blue-200 rounded-xl bg-blue-50 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-black mb-1">Summary of Incident</label>
-          <textarea
-            name="summaryIncident"
-            value={formData.summaryIncident || ''}
-            onChange={handleChange}
-            rows={4}
-            className="w-full px-4 py-2 border border-blue-200 rounded-xl bg-blue-50 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-black mb-1">Lessons Learnt</label>
-          <textarea
-            name="lessonsLearnt"
-            value={formData.lessonsLearnt || ''}
-            onChange={handleChange}
-            rows={4}
-            className="w-full px-4 py-2 border border-blue-200 rounded-xl bg-blue-50 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={saving}
-            className={`px-6 py-2 font-semibold rounded-xl shadow transition ${
-              saving
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-} */
-
-
-'use client';
 /* 
-will have to render the previous info which was inserted.
-
-use useparams to get the reportId
-
-1)fetch the og report
-2)fill in the respective fields
-3)
+check if state is rendered from casualty
 */
-import React, { useEffect, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
-import { useForm } from 'react-hook-form';
-import { useRouter, useParams } from 'next/navigation';
 
+'use client';
+import React, { useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import { useRouter, useParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { reportSchema } from '@/types';
 import axios from 'axios';
 import { z } from 'zod';
-
-const inputClass = 'w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-200';
-const labelClass = 'block text-sm font-semibold text-gray-700 mb-1';
-const errorClass = 'text-red-500 text-xs mt-1';
-const requiredFieldClass = `${labelClass} after:content-['*'] after:ml-0.5 after:text-red-500`;
+import { CasualtyForm } from '@/components/CasualtyForm';
+import {
+  reportSchema,
+  IncidentConsequence,
+  Flag,
+  ShipType,
+  RegistrationType,
+  LocationType,
+  AreaType,
+  Bunkers,
+  ConditionType,
+  OwnershipType,
+  SeverityType,
+  IncidentCategory
+} from '@/types';
 
 type ReportInput = z.input<typeof reportSchema>;
 
-export default function CreateReportForm() {
+export default function UpdateReportForm() {
   const { user } = useUser();
-
   const params = useParams();
-  //console.log(params)
   const router = useRouter();
   const reportId = params.reportId as string;
-  console.log(reportId)
 
-  const [formData, setFormData] = useState<Partial<ReportInput>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-/* 
-  useEffect(() => {
-    const fetchReport = async () => {
-      try {
-        const res = await axios.get(`/api/me/reports/${reportId}`);
-        setFormData(res.data);
-        console.log(res.data)
-      } catch (error) {
-        console.error('Error fetching report:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReport();
-  }, [reportId]); */
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ReportInput>({
-    resolver: zodResolver(reportSchema),
-    //mode: 'onBlur',
-    //defaultValues:formData
-    defaultValues: async()=>{
-      console.log(reportId)
-      const response=await axios.get(`/api/me/reports/${reportId}`)
-      console.log(response.data)
-      return response.data
+// In UpdateReportForm component
+const methods = useForm<ReportInput>({
+  resolver: zodResolver(reportSchema),
+  mode: 'onBlur',
+  defaultValues: async () => {
+    const response = await axios.get(`/api/me/reports/${reportId}`); // do i need to pass reportId
+    const data = response.data;
+    
+    // Ensure casualties array exists or initialize as empty array
+    if (!data.casualties) {
+      data.casualties = [];
     }
-  });
+    
+    return data;
+  }
+});
+
+  const { register, handleSubmit, setValue, formState: { errors }, control } = methods;
+  
+  const watchValues = useWatch({ control });
+  const watchIncidentConsequences = useWatch({
+    control,
+    name: 'incidentConsequences',
+  }) as IncidentConsequence;
+
+  useEffect(() => {
+    if (user?.id) {
+      setValue('userId', user.id);
+    }
+  }, [user?.id, setValue]);
 
   const onSubmit = async (data: ReportInput) => {
-    console.log(data);
+    console.log(data)
     try {
-      await axios.put(`/api/me/reports/${reportId}`,data);
-      alert('Report submitted successfully!');// fix the api
-      router.push(`/user/dashboard/${reportId}`);
+      const response = await axios.put(`/api/me/reports/${reportId}`, data); //send in different
+      alert('Report updated successfully!');
+      router.push(`/user/dashboard`);
     } catch (err) {
       console.error(err);
-      alert('Failed to submit report.');
+      alert('Failed to update report.');
     }
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-8 text-black">Create New Incident Report</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {/* Ship Information */}
-        <div className="md:col-span-2">
-          <h2 className="text-xl font-semibold mb-4 text-black border-b pb-2">Ship Information</h2>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="shipName" className={requiredFieldClass}>Ship's Name</label>
-              <input id="shipName" {...register('shipName')} className={inputClass} />
-              {errors.shipName && <p className={errorClass}>{errors.shipName.message}</p>}
-            </div>
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className='flex justify-between mb-6'>
+        <h1 className="text-2xl font-bold text-black">Edit Incident Report</h1>
+      </div>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-white border rounded-lg p-6">
+          {/* Section 1: SHIP/REPORTING & INCIDENT TIME/TOTAL CREW ON BOARD DATA */}
+          <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2">
+            1. Ship & Reporting Information
+          </h2>
+          
+          <FormField label="Ship Name" name="shipName" register={register} errors={errors} required />
+          <FormField label="IMO Number" name="imoNumber" register={register} errors={errors} required />
+          
+          <DropdownField 
+            label="Flag" 
+            name="flag" 
+            options={Object.values(Flag)} 
+            register={register} 
+            errors={errors} 
+          />
+          
+          <DropdownField 
+            label="Ship Type" 
+            name="shipType" 
+            options={Object.values(ShipType)} 
+            register={register} 
+            errors={errors} 
+          />
+          
+          <DropdownField 
+            label="Registration Type" 
+            name="registrationType" 
+            options={Object.values(RegistrationType)} 
+            register={register} 
+            errors={errors} 
+          />
+          
+          <FormField label="Position of Vessel" name="positionOfVessel" register={register} errors={errors} />
+          
+          <DropdownField 
+            label="Location of Vessel" 
+            name="locationOfVessel" 
+            options={Object.values(LocationType)} 
+            register={register} 
+            errors={errors} 
+          />
+          
+          <DropdownField 
+            label="Area of Incident" 
+            name="areaOfIncident" 
+            options={Object.values(AreaType)} 
+            register={register} 
+            errors={errors} 
+          />
+          
+          <FormField label="Deadweight" name="deadweight" register={register} errors={errors} />
+          <FormField label="Year Built" name="yearBuilt" register={register} errors={errors} type="number" />
+          <FormField label="Gross Tonnage (GT)" name="gt" register={register} errors={errors} />
+          <FormField label="Draft Before" name="draftBefore" register={register} errors={errors} />
+          <FormField label="Draft Aft" name="draftAft" register={register} errors={errors} />
+          <FormField label="Freeboard" name="freeboard" register={register} errors={errors} />
+          <FormField label="Cargo Type & Quantity" name="cargoTypeQty" register={register} errors={errors} />
+          
+          <DropdownField 
+            label="Bunkers" 
+            name="bunkers" 
+            options={Object.values(Bunkers)} 
+            register={register} 
+            errors={errors} 
+          />
+          
+          <FormField label="Classification Society" name="classificationSociety" register={register} errors={errors} />
+          <FormField label="Last Port of Call" name="lastPortOfCall" register={register} errors={errors} />
+          <FormField label="Next Port of Call" name="nextPortOfCall" register={register} errors={errors} />
+          <FormField label="P&I Club" name="piClub" register={register} errors={errors} />
+          <FormField label="Hull & Machinery Underwriters" name="hullMachineryUnderwriters" register={register} errors={errors} />
+          
+          <DropdownField 
+            label="Loaded/Ballast Condition" 
+            name="conditionLoadedBallast" 
+            options={Object.values(ConditionType)} 
+            register={register} 
+            errors={errors} 
+          />
+          
+          <FormField label="Total Crew On Board" name="totalCrewOnBoard" register={register} errors={errors} type="number" />
+          <FormField label="Incident Date" name="incidentDate" register={register} errors={errors} required type="datetime-local" />
 
-            <div>
-              <label htmlFor="imoNumber" className={requiredFieldClass}>IMO Number</label>
-              <input id="imoNumber" {...register('imoNumber')} className={inputClass} />
-              {errors.imoNumber && <p className={errorClass}>{errors.imoNumber.message}</p>}
-            </div>
+          {/* Section 2: OWNERS/MANAGER/RPS DATA */}
+          <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">
+            2. Ownership & Management Information
+          </h2>
+          
+          <DropdownField 
+            label="Ownership Type" 
+            name="ownershipType" 
+            options={Object.values(OwnershipType)} 
+            register={register} 
+            errors={errors} 
+          />
+          
+          <FormField label="Technical Manager Name" name="techManagerName" register={register} errors={errors} />
+          <FormField label="Technical Manager Address" name="techManagerAddress" register={register} errors={errors} />
+          <FormField label="Technical Manager Phone" name="techManagerPhone" register={register} errors={errors} />
+          <FormField label="Technical Manager Email" name="techManagerEmail" register={register} errors={errors} type="email" />
+          
+          <FormField label="DPA Name" name="dpaName" register={register} errors={errors} />
+          <FormField label="DPA Phone" name="dpaPhone" register={register} errors={errors} />
+          <FormField label="DPA Mobile" name="dpaMobile" register={register} errors={errors} />
+          <FormField label="DPA Email" name="dpaEmail" register={register} errors={errors} type="email" />
+          
+          <FormField label="RPS Agency Name" name="rpsAgencyName" register={register} errors={errors} />
+          <FormField label="RPS Agency Address" name="rpsAgencyAddress" register={register} errors={errors} />
+          <FormField label="RPS Agency Phone" name="rpsAgencyPhone" register={register} errors={errors} />
+          <FormField label="RPS Agency Email" name="rpsAgencyEmail" register={register} errors={errors} type="email" />
+          <FormField label="RPS Agency Contact Name" name="rpsAgencyContactName" register={register} errors={errors} />
+          <FormField label="RPS Agency Contact Phone" name="rpsAgencyContactPhone" register={register} errors={errors} />
+          <FormField label="RPS Agency Contact Email" name="rpsAgencyContactEmail" register={register} errors={errors} type="email" />
+          <FormField label="RPSL Number" name="rpslNumber" register={register} errors={errors} />
+          
+          <FormField label="Local Agency Name" name="localAgencyName" register={register} errors={errors} />
+          <FormField label="Local Agency Address" name="localAgencyAddress" register={register} errors={errors} />
+          <FormField label="Local Agency Phone" name="localAgencyPhone" register={register} errors={errors} />
+          <FormField label="Local Agency Email" name="localAgencyEmail" register={register} errors={errors} type="email" />
+          <FormField label="Local Agency Contact Name" name="localAgencyContactName" register={register} errors={errors} />
+          <FormField label="Local Agency Contact Phone" name="localAgencyContactPhone" register={register} errors={errors} />
+          <FormField label="Local Agency Contact Email" name="localAgencyContactEmail" register={register} errors={errors} type="email" />
 
-            <div>
-              <label htmlFor="flag" className={labelClass}>Flag</label>
-              <input id="flag" {...register('flag')} className={inputClass} />
-              {errors.flag && <p className={errorClass}>{errors.flag.message}</p>}
-            </div>
+          {/* Section 3: SEVERITY OF INCIDENT DATA */}
+          <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">
+            3. Incident Details
+          </h2>
+          
+          <DropdownField 
+            label="Severity of Incident" 
+            name="severityOfIncident" 
+            options={Object.values(SeverityType)} 
+            register={register} 
+            errors={errors} 
+          />
+          
+          <DropdownField 
+            label="Incident Category" 
+            name="incidentCategory" 
+            options={Object.values(IncidentCategory)} 
+            register={register} 
+            errors={errors} 
+          />
 
-            <div>
-              <label htmlFor="shipType" className={labelClass}>Type of Ship</label>
-              <input id="shipType" {...register('shipType')} className={inputClass} />
-              {errors.shipType && <p className={errorClass}>{errors.shipType.message}</p>}
-            </div>
+          <DropdownField 
+            label="Incident Consequences" 
+            name="incidentConsequences" 
+            options={Object.values(IncidentConsequence)} 
+            register={register} 
+            errors={errors} 
+          />
 
-            <div>
-              <label htmlFor="registrationType" className={labelClass}>Registration Type</label>
-              <input id="registrationType" {...register('registrationType')} className={inputClass} />
-              {errors.registrationType && <p className={errorClass}>{errors.registrationType.message}</p>}
-            </div>
+          {watchIncidentConsequences === IncidentConsequence.PersonnelMatters && (
+            <>
+              <FormField label="Deaths" name="deaths" register={register} errors={errors} type="number" />
+              <FormField label="Injuries" name="injured" register={register} errors={errors} type="number" />
+              <FormField label="Sickness" name="sickness" register={register} errors={errors} type="number" />
+              <FormField label="Desertion" name="desertion" register={register} errors={errors} type="number" />
+              <FormField label="Man Overboard-Survived" name="manOverboardSurvived" register={register} errors={errors} type="number" />
+              <CasualtyForm />
+            </>
+          )}
 
-            <div>
-              <label htmlFor="positionOfVessel" className={labelClass}>Position of Vessel</label>
-              <input id="positionOfVessel" {...register('positionOfVessel')} className={inputClass} />
-              {errors.positionOfVessel && <p className={errorClass}>{errors.positionOfVessel.message}</p>}
-            </div>
+          <FormField 
+            label="Brief Summary of Incident" 
+            name="summaryIncident" 
+            register={register} 
+            errors={errors} 
+            className="md:col-span-2" 
+          />
+          <FormField 
+            label="Actions Taken" 
+            name="summaryAction" 
+            register={register} 
+            errors={errors} 
+            className="md:col-span-2" 
+          />
+          <FormField 
+            label="Causal Factors" 
+            name="causalFactors" 
+            register={register} 
+            errors={errors} 
+            className="md:col-span-2" 
+          />
+          <FormField 
+            label="Lessons Learnt" 
+            name="lessonsLearnt" 
+            register={register} 
+            errors={errors} 
+            className="md:col-span-2" 
+          />
 
-            <div>
-              <label htmlFor="locationOfVessel" className={labelClass}>Location of Vessel</label>
-              <input id="locationOfVessel" {...register('locationOfVessel')} className={inputClass} />
-              {errors.locationOfVessel && <p className={errorClass}>{errors.locationOfVessel.message}</p>}
-            </div>
+          {/* Section 4: ADDITIONAL DATA */}
+          <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">
+            4. Additional Information
+          </h2>
+          
+          <FormField label="SAR Required" name="sarRequired" register={register} errors={errors} type="checkbox" />
+          <FormField label="Oil Pollution Extent" name="oilPollutionExtent" register={register} errors={errors} />
+          <FormField label="Oil Spilled Volume" name="oilSpilledVolume" register={register} errors={errors} />
+          <FormField label="Weather Conditions" name="weatherConditions" register={register} errors={errors} />
+          <FormField label="Tidal Conditions" name="tidalConditions" register={register} errors={errors} />
+          
+          <FormField 
+            label="Media URLs (comma-separated)" 
+            name="mediaUrls" 
+            register={register} 
+            errors={errors} 
+            className="md:col-span-2" 
+          />
+          
+          <FormField label="Reported By" name="reportedBy" register={register} errors={errors} />
+          <FormField label="Company Name" name="companyName" register={register} errors={errors} />
+          <FormField label="Designation" name="designation" register={register} errors={errors} />
+          <FormField label="Contact Number" name="contactNumber" register={register} errors={errors} />
 
-            <div>
-              <label htmlFor="areaOfIncident" className={labelClass}>Area of Incident</label>
-              <input id="areaOfIncident" {...register('areaOfIncident')} className={inputClass} />
-              {errors.areaOfIncident && <p className={errorClass}>{errors.areaOfIncident.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="yearBuilt" className={labelClass}>Year Built</label>
-              <input id="yearBuilt" type="number"   {...register('yearBuilt', { valueAsNumber: true })} className={inputClass} />
-              {errors.yearBuilt && <p className={errorClass}>{errors.yearBuilt.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="deadweight" className={labelClass}>Deadweight</label>
-              <input id="deadweight" {...register('deadweight')} className={inputClass} />
-              {errors.deadweight && <p className={errorClass}>{errors.deadweight.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="gt" className={labelClass}>Gross Tonnage (GT)</label>
-              <input id="gt" {...register('gt')} className={inputClass} />
-              {errors.gt && <p className={errorClass}>{errors.gt.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="maxDraft" className={labelClass}>Maximum Draft</label>
-              <input id="maxDraft" {...register('maxDraft')} className={inputClass} />
-              {errors.maxDraft && <p className={errorClass}>{errors.maxDraft.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="classificationSociety" className={labelClass}>Classification Society</label>
-              <input id="classificationSociety" {...register('classificationSociety')} className={inputClass} />
-              {errors.classificationSociety && <p className={errorClass}>{errors.classificationSociety.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="piClub" className={labelClass}>P&I Club</label>
-              <input id="piClub" {...register('piClub')} className={inputClass} />
-              {errors.piClub && <p className={errorClass}>{errors.piClub.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="hullMachineryUnderwriters" className={labelClass}>Hull & Machinery Insurer</label>
-              <input id="hullMachineryUnderwriters" {...register('hullMachineryUnderwriters')} className={inputClass} />
-              {errors.hullMachineryUnderwriters && <p className={errorClass}>{errors.hullMachineryUnderwriters.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="totalCrewOnBoard" className={labelClass}>Total Crew on Board</label>
-              <input id="totalCrewOnBoard" type="number" {...register('totalCrewOnBoard', { valueAsNumber: true })} className={inputClass} />
-              {errors.totalCrewOnBoard && <p className={errorClass}>{errors.totalCrewOnBoard.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="conditionLoadedBallast" className={labelClass}>Loaded / Ballast Condition</label>
-              <input id="conditionLoadedBallast" {...register('conditionLoadedBallast')} className={inputClass} />
-              {errors.conditionLoadedBallast && <p className={errorClass}>{errors.conditionLoadedBallast.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="severityOfIncident" className={labelClass}>Severity of Incident</label>
-              <input id="severityOfIncident" {...register('severityOfIncident')} className={inputClass} />
-              {errors.severityOfIncident && <p className={errorClass}>{errors.severityOfIncident.message}</p>}
-            </div>
+          {/* Submit Button */}
+          <div className="col-span-full flex justify-end mt-4">
+            <button
+              type="submit" 
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Update Report
+            </button>
           </div>
-        </div>
-
-        {/* Incident Details */}
-        <div className="md:col-span-2">
-          <h2 className="text-xl font-semibold mb-4 text-black border-b pb-2">Incident Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="incidentDate" className={requiredFieldClass}>Incident Date</label>
-              <input id="incidentDate" type="date" {...register('incidentDate')} className={inputClass} />
-              {errors.incidentDate && <p className={errorClass}>{errors.incidentDate.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="reportedAt" className={requiredFieldClass}>Reported At</label>
-              <input id="reportedAt" type="datetime-local" {...register('reportedAt')} className={inputClass} />
-              {errors.reportedAt && <p className={errorClass}>{errors.reportedAt.message}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* Port & Cargo Details */}
-        <div className="md:col-span-2">
-          <h2 className="text-xl font-semibold mb-4 text-black border-b pb-2">Port & Cargo Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="lastPortOfCall" className={labelClass}>Last Port of Call</label>
-              <input id="lastPortOfCall" {...register('lastPortOfCall')} className={inputClass} />
-              {errors.lastPortOfCall && <p className={errorClass}>{errors.lastPortOfCall.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="freeboard" className={labelClass}>Freeboard</label>
-              <input id="freeboard" {...register('freeboard')} className={inputClass} />
-              {errors.freeboard && <p className={errorClass}>{errors.freeboard.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="cargoTypeQty" className={labelClass}>Cargo Type & Quantity</label>
-              <input id="cargoTypeQty" {...register('cargoTypeQty')} className={inputClass} />
-              {errors.cargoTypeQty && <p className={errorClass}>{errors.cargoTypeQty.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="bunkers" className={labelClass}>Bunkers</label>
-              <input id="bunkers" {...register('bunkers')} className={inputClass} />
-              {errors.bunkers && <p className={errorClass}>{errors.bunkers.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="ownershipType" className={labelClass}>Ownership Type</label>
-              <input id="ownershipType" {...register('ownershipType')} className={inputClass} />
-              {errors.ownershipType && <p className={errorClass}>{errors.ownershipType.message}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* Tech Manager Info */}
-        <div className="md:col-span-2">
-          <h2 className="text-xl font-semibold mb-4 text-black border-b pb-2">Tech Manager Info</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="techManagerName" className={labelClass}>Technical Manager Name</label>
-              <input id="techManagerName" {...register('techManagerName')} className={inputClass} />
-              {errors.techManagerName && <p className={errorClass}>{errors.techManagerName.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="techManagerAddress" className={labelClass}>Technical Manager Address</label>
-              <input id="techManagerAddress" {...register('techManagerAddress')} className={inputClass} />
-              {errors.techManagerAddress && <p className={errorClass}>{errors.techManagerAddress.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="techManagerPhone" className={labelClass}>Technical Manager Phone</label>
-              <input id="techManagerPhone" {...register('techManagerPhone')} className={inputClass} />
-              {errors.techManagerPhone && <p className={errorClass}>{errors.techManagerPhone.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="techManagerEmail" className={labelClass}>Technical Manager Email</label>
-              <input id="techManagerEmail" type="email" {...register('techManagerEmail')} className={inputClass} />
-              {errors.techManagerEmail && <p className={errorClass}>{errors.techManagerEmail.message}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* DPA Information */}
-        <div className="md:col-span-2">
-          <h2 className="text-xl font-semibold mb-4 text-black border-b pb-2">DPA Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="dpaName" className={requiredFieldClass}>DPA Name</label>
-              <input id="dpaName" {...register('dpaName')} className={inputClass} />
-              {errors.dpaName && <p className={errorClass}>{errors.dpaName.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="dpaPhone" className={requiredFieldClass}>DPA Phone</label>
-              <input id="dpaPhone" {...register('dpaPhone')} className={inputClass} />
-              {errors.dpaPhone && <p className={errorClass}>{errors.dpaPhone.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="dpaMobile" className={requiredFieldClass}>DPA Mobile</label>
-              <input id="dpaMobile" {...register('dpaMobile')} className={inputClass} />
-              {errors.dpaMobile && <p className={errorClass}>{errors.dpaMobile.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="dpaEmail" className={requiredFieldClass}>DPA Email</label>
-              <input id="dpaEmail" type="email" {...register('dpaEmail')} className={inputClass} />
-              {errors.dpaEmail && <p className={errorClass}>{errors.dpaEmail.message}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* Incident Info */}
-        <div className="md:col-span-2">
-          <h2 className="text-xl font-semibold mb-4 text-black border-b pb-2">Incident Info</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="incidentCategory" className={labelClass}>Incident Category</label>
-              <input id="incidentCategory" {...register('incidentCategory')} className={inputClass} />
-              {errors.incidentCategory && <p className={errorClass}>{errors.incidentCategory.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="incidentConsequences" className={labelClass}>Incident Consequences</label>
-              <input id="incidentConsequences" {...register('incidentConsequences')} className={inputClass} />
-              {errors.incidentConsequences && <p className={errorClass}>{errors.incidentConsequences.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="deaths" className={labelClass}>Deaths</label>
-              <input id="deaths" type="number" {...register('deaths', { valueAsNumber: true })} className={inputClass} />
-              {errors.deaths && <p className={errorClass}>{errors.deaths.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="injured" className={labelClass}>Injured</label>
-              <input id="injured" type="number" {...register('injured', { valueAsNumber: true })} className={inputClass} />
-              {errors.injured && <p className={errorClass}>{errors.injured.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="deceasedDetails" className={labelClass}>Details of Deceased</label>
-              <input id="deceasedDetails" {...register('deceasedDetails')} className={inputClass} />
-              {errors.deceasedDetails && <p className={errorClass}>{errors.deceasedDetails.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="summaryIncident" className={labelClass}>Incident Summary</label>
-              <input id="summaryIncident" {...register('summaryIncident')} className={inputClass} />
-              {errors.summaryIncident && <p className={errorClass}>{errors.summaryIncident.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="summaryAction" className={labelClass}>Actions Taken</label>
-              <input id="summaryAction" {...register('summaryAction')} className={inputClass} />
-              {errors.summaryAction && <p className={errorClass}>{errors.summaryAction.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="lessonsLearnt" className={labelClass}>Lessons Learnt</label>
-              <input id="lessonsLearnt" {...register('lessonsLearnt')} className={inputClass} />
-              {errors.lessonsLearnt && <p className={errorClass}>{errors.lessonsLearnt.message}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* SAR / Pollution */}
-        <div className="md:col-span-2">
-          <h2 className="text-xl font-semibold mb-4 text-black border-b pb-2">SAR / Pollution</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="sarRequired" className={labelClass}>SAR Required</label>
-              <input id="sarRequired" {...register('sarRequired')} className={inputClass} />
-              {errors.sarRequired && <p className={errorClass}>{errors.sarRequired.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="oilPollutionExtent" className={labelClass}>Oil Pollution Extent</label>
-              <input id="oilPollutionExtent" {...register('oilPollutionExtent')} className={inputClass} />
-              {errors.oilPollutionExtent && <p className={errorClass}>{errors.oilPollutionExtent.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="weatherConditions" className={labelClass}>Weather Conditions</label>
-              <input id="weatherConditions" {...register('weatherConditions')} className={inputClass} />
-              {errors.weatherConditions && <p className={errorClass}>{errors.weatherConditions.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="tidalConditions" className={labelClass}>Tidal Conditions</label>
-              <input id="tidalConditions" {...register('tidalConditions')} className={inputClass} />
-              {errors.tidalConditions && <p className={errorClass}>{errors.tidalConditions.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="oilSpilledVolume" className={labelClass}>Oil Spilled Volume</label>
-              <input id="oilSpilledVolume" {...register('oilSpilledVolume')} className={inputClass} />
-              {errors.oilSpilledVolume && <p className={errorClass}>{errors.oilSpilledVolume.message}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* User ID (hidden) */}
-        <input type="hidden" {...register('userId')} value={user?.id || ''} />
-
-        {/* Media URLs */}
-        <div className="md:col-span-2">
-          <label htmlFor="mediaUrls" className={labelClass}>Media URLs (comma-separated)</label>
-          <input id="mediaUrls" {...register('mediaUrls')} className={inputClass} />
-          {errors.mediaUrls && <p className={errorClass}>{errors.mediaUrls.message}</p>}
-        </div>
-
-        {/* Submit Button */}
-        <div className="md:col-span-2 flex justify-end mt-8">
-          <button 
-            type="submit" 
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition duration-200"
-          >
-            Submit Report
-          </button>
-        </div>
-      </form>
+        </form>
+      </FormProvider>
     </div>
   );
 }
 
+type FormFieldProps = {
+  label: string;
+  name: keyof ReportInput;
+  register: any;
+  errors: any;
+  required?: boolean;
+  type?: string;
+  className?: string;
+}
 
+const FormField = ({ label, name, register, errors, required = false, type = 'text', className = '' }: FormFieldProps) => {
+  if (type === 'checkbox') {
+    return (
+      <div className={`flex items-center ${className}`}>
+        <input
+          type="checkbox"
+          id={name}
+          {...register(name)}
+          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+        />
+        <label htmlFor={name} className="ml-2 block text-xs font-semibold text-gray-600">
+          {label}
+        </label>
+        {errors[name] && <span className="text-red-500 text-xs mt-1">{errors[name].message}</span>}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`flex flex-col ${className}`}>
+      <label className={`text-xs font-semibold text-gray-600 ${required ? "after:content-['*'] after:ml-0.5 after:text-red-500" : ''}`}>
+        {label}
+      </label>
+      <input
+        type={type}
+        {...register(name)}
+        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-black focus:outline-none focus:ring-1 focus:ring-blue-200"
+      />
+      {errors[name] && <span className="text-red-500 text-xs mt-1">{errors[name].message}</span>}
+    </div>
+  );
+};
+
+type DropdownFieldProps = {
+  label: string;
+  name: keyof ReportInput;
+  options: string[];
+  register: any;
+  errors: any;
+  required?: boolean;
+  className?: string;
+}
+
+const DropdownField = ({ 
+  label, 
+  name, 
+  options, 
+  register, 
+  errors, 
+  required = false, 
+  className = ''
+}: DropdownFieldProps) => {
+  return (
+    <div className={`flex flex-col ${className}`}>
+      <label className={`text-xs font-semibold text-gray-600 ${required ? "after:content-['*'] after:ml-0.5 after:text-red-500" : ''}`}>
+        {label}
+      </label>
+      <select
+        {...register(name)}
+        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-black focus:outline-none focus:ring-1 focus:ring-blue-200"
+      >
+        <option value="">Select {label}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      {errors[name] && <span className="text-red-500 text-xs mt-1">{errors[name].message}</span>}
+    </div>
+  );
+};
