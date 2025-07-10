@@ -13,7 +13,7 @@ import { z } from 'zod';
 import { CasualtyForm } from '@/components/CasualtyForm';
 import {
   reportSchema,
-  IncidentConsequence,
+  IncidentConsequences,
   Flag,
   ShipType,
   RegistrationType,
@@ -57,7 +57,7 @@ const methods = useForm<ReportInput>({
   const watchIncidentConsequences = useWatch({
     control,
     name: 'incidentConsequences',
-  }) as IncidentConsequence;
+  }) as IncidentConsequences;
 
   useEffect(() => {
     if (user?.id) {
@@ -231,12 +231,12 @@ const methods = useForm<ReportInput>({
           <DropdownField 
             label="Incident Consequences" 
             name="incidentConsequences" 
-            options={Object.values(IncidentConsequence)} 
+            options={Object.values(IncidentConsequences)} 
             register={register} 
             errors={errors} 
           />
 
-          {watchIncidentConsequences === IncidentConsequence.PersonnelMatters && (
+          {watchIncidentConsequences === IncidentConsequences.PersonnelMatters && (
             <>
               <FormField label="Deaths" name="deaths" register={register} errors={errors} type="number" />
               <FormField label="Injuries" name="injured" register={register} errors={errors} type="number" />

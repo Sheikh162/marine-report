@@ -134,7 +134,7 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
   );
 }
 
-function Info({ label, value }: { label: string; value?: string | null }) {
+function Info({ label, value }: { label: string; value?: string |string[]| null }) {
   return (
     <div className="flex flex-col border-b pb-2">
       <span className="text-xs font-semibold text-gray-600">{label}</span>

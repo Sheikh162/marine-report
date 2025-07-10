@@ -16,7 +16,7 @@ export default function ReportsPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Filter form state
-  const [filters, setFilters] = useState({
+/*   const [filters, setFilters] = useState({
     incidentCategory: '',
     casualtyStatus: '',
     fromReportDate: '',
@@ -28,7 +28,7 @@ export default function ReportsPage() {
     shipType: '',
     injuries: '',
     area: ''
-  });
+  }); */
 
   // Mock data - replace with your API call
   useEffect(() => {
@@ -42,6 +42,7 @@ export default function ReportsPage() {
         setReports(response.data);
       } catch (err) {
         setError('Failed to load reports');
+        alert('failed to get reports')
         console.error(err);
       } finally {
         setLoading(false);
@@ -51,7 +52,7 @@ export default function ReportsPage() {
     fetchData();
   }, []);
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+/*   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
   };
@@ -60,7 +61,7 @@ export default function ReportsPage() {
     e.preventDefault();
     // Implement filter logic here
     console.log('Filters applied:', filters);
-  };
+  }; */
 
   if (loading) return <div className="p-4 text-center text-black">Loading...</div>;
   if (error) return <div className="p-4 text-center text-red-600">{error}</div>;
@@ -70,11 +71,9 @@ export default function ReportsPage() {
       <h1 className="text-2xl font-bold mb-6 text-black">CASUALTIES/INCIDENTS</h1>
       
       {/* Filter Form Section */}
-      <div className="bg-gray-100 p-4 rounded-lg mb-6">
+{/*       <div className="bg-gray-100 p-4 rounded-lg mb-6">
         <h2 className="text-lg font-semibold mb-4 text-black">Filters</h2>
-        
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {/* Row 1 */}
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Ship's Name</label>
             <input
@@ -83,7 +82,7 @@ export default function ReportsPage() {
               placeholder="Enter ship name"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Incident Category</label>
             <select 
@@ -94,10 +93,9 @@ export default function ReportsPage() {
               <option value="" className="text-black">Select a type</option>
               <option value="Personnel Related" className="text-black">Personnel Related</option>
               <option value="Fire & Explosion" className="text-black">Fire & Explosion</option>
-              {/* Add more options */}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Casualty Status</label>
             <select 
@@ -110,7 +108,7 @@ export default function ReportsPage() {
               <option value="Closed" className="text-black">Closed</option>
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Date Reported - From</label>
             <input
@@ -120,8 +118,7 @@ export default function ReportsPage() {
               onChange={handleFilterChange}
             />
           </div>
-          
-          {/* Row 2 */}
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">IMO No.</label>
             <input
@@ -130,7 +127,7 @@ export default function ReportsPage() {
               placeholder="Enter IMO number"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Number of Deaths</label>
             <input
@@ -140,7 +137,7 @@ export default function ReportsPage() {
               onChange={handleFilterChange}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Incident From Date</label>
             <input
@@ -150,7 +147,7 @@ export default function ReportsPage() {
               onChange={handleFilterChange}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Date Reported - To</label>
             <input
@@ -160,8 +157,7 @@ export default function ReportsPage() {
               onChange={handleFilterChange}
             />
           </div>
-          
-          {/* Row 3 */}
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Flag</label>
             <select 
@@ -172,10 +168,9 @@ export default function ReportsPage() {
               <option value="" className="text-black">Select Flag</option>
               <option value="Liberia" className="text-black">Liberia</option>
               <option value="Panama" className="text-black">Panama</option>
-              {/* Add more options */}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Number of Injuries</label>
             <input
@@ -185,7 +180,7 @@ export default function ReportsPage() {
               onChange={handleFilterChange}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Incident To Date</label>
             <input
@@ -195,8 +190,7 @@ export default function ReportsPage() {
               onChange={handleFilterChange}
             />
           </div>
-          
-          {/* Row 4 */}
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Ship Type</label>
             <select 
@@ -207,10 +201,9 @@ export default function ReportsPage() {
               <option value="" className="text-black">Select Ship Type</option>
               <option value="Crude Oil Tanker" className="text-black">Crude Oil Tanker</option>
               <option value="Bulk Carrier" className="text-black">Bulk Carrier</option>
-              {/* Add more options */}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1 text-black">Area of Incident</label>
             <select 
@@ -223,7 +216,7 @@ export default function ReportsPage() {
               <option value="Outside Indian Waters" className="text-black">Outside Indian Waters</option>
             </select>
           </div>
-          
+
           <div className="flex items-end">
             <button
               type="submit"
@@ -252,15 +245,16 @@ export default function ReportsPage() {
             </button>
           </div>
         </form>
-      </div>
+      </div> */}
+
       
       {/* Incidents Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
-{/*               <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Date & Time reported to DOCOMM</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Incident Date</th> */}
+              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Date & Time reported to DOCOMM</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Incident Date</th>
               <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Ship's Name</th>
               <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">IMO No.</th>
               <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Flag</th>
@@ -272,8 +266,8 @@ export default function ReportsPage() {
           <tbody className="divide-y divide-gray-200">
             {reports.map((report) => (
               <tr key={report.id} onClick={()=>{router.push(`/admin/${report.id}`)}} className="hover:bg-gray-50 cursor-pointer">
-{/*                 <td className="px-4 py-2 border text-black">{report.reportedAt}</td>
-                <td className="px-4 py-2 border text-black">{report.incidentDate}</td> */}
+                <td className="px-4 py-2 border text-black">{new Date(report.reportedAt as Date).toLocaleString()}</td>
+                <td className="px-4 py-2 border text-black">{new Date(report.incidentDate as Date).toLocaleString()}</td>
                 <td className="px-4 py-2 border text-black">{report.shipName}</td>
                 <td className="px-4 py-2 border text-black">{report.imoNumber}</td>
                 <td className="px-4 py-2 border text-black">{report.flag}</td>

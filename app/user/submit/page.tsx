@@ -20,7 +20,8 @@ export default function CreateReportForm() {
     mode: 'onBlur',
     defaultValues:{
       deaths:0,
-      injured:0
+      injured:0,
+      casualties:[]
     }
   });
 
@@ -46,7 +47,7 @@ export default function CreateReportForm() {
   }, []);
 
   const onSubmit = async (data: ReportInput) => {
-    console.log(watchValues)
+    //console.log(watchValues)
     console.log(data)
     try {
       await axios.post('/api/me/reports', data);
@@ -165,8 +166,14 @@ export default function CreateReportForm() {
             errors={errors} 
           />
           
-          <FormField required label="Total Crew On Board" name="totalCrewOnBoard" register={register} errors={errors} type="number" />
-          <FormField label="Incident Date" name="incidentDate" register={register} errors={errors} required type="datetime-local" />
+          <FormField
+            required
+            label="Total Crew On Board"
+            name="totalCrewOnBoard"
+            register={(name:keyof ReportInput) => register(name, { valueAsNumber: true })}
+            errors={errors}
+            type="number"
+          />          <FormField label="Incident Date" name="incidentDate" register={register} errors={errors} required type="datetime-local" />
 
           {/* Section 2: OWNERS/MANAGER/RPS DATA */}
           <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">
@@ -243,12 +250,48 @@ export default function CreateReportForm() {
           />
           {casualtyComponent && (
           <>
-            <FormField required label="Deaths" name="deaths" register={register} errors={errors} type="number" />
-            <FormField required label="Injuries" name="injured" register={register} errors={errors} type="number" />
-            <FormField label="Sickness" name="sickness" register={register} errors={errors} type="number" />
-            <FormField label="Desertion" name="desertion" register={register} errors={errors} type="number" />
-            <FormField label="Man Overboard-Survived" name="manOverboardSurvived" register={register} errors={errors} type="number" />
-            <CasualtyForm/>
+          <FormField
+            required
+            label="Deaths"
+            name="deaths"
+            register={(name:keyof ReportInput) => register(name, { valueAsNumber: true })}
+            errors={errors}
+            type="number"
+          />
+
+          <FormField
+            required
+            label="Injuries"
+            name="injured"
+            register={(name:keyof ReportInput) => register(name, { valueAsNumber: true })}
+            errors={errors}
+            type="number"
+          />
+
+          <FormField
+            label="Sickness"
+            name="sickness"
+            register={(name:keyof ReportInput) => register(name, { valueAsNumber: true })}
+            errors={errors}
+            type="number"
+          />
+
+          <FormField
+            label="Desertion"
+            name="desertion"
+            register={(name:keyof ReportInput) => register(name, { valueAsNumber: true })}
+            errors={errors}
+            type="number"
+          />
+
+          <FormField
+            label="Man Overboard-Survived"
+            name="manOverboardSurvived"
+            register={(name:keyof ReportInput) => register(name, { valueAsNumber: true })}
+            errors={errors}
+            type="number"
+          />
+          <CasualtyForm/>
           </>
           )}
           
@@ -308,7 +351,7 @@ export default function CreateReportForm() {
 
           {/* Submit Button */}
           <div className="col-span-full flex justify-end mt-4">
-            <button onClick={()=>{console.log(watchValues)}}
+            <button /* onClick={()=>{console.log(watchValues)}} */
               type="submit" 
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
@@ -442,7 +485,7 @@ const CheckboxGroupField = ({
     setCasualtyComponent(isPersonnelMatters);
   }, [watchIncidentConsequences, setCasualtyComponent]);
   
-  console.log(watchIncidentConsequences)
+  //console.log(watchIncidentConsequences)
   return (
     <>
     <div className={`flex flex-col ${className}`}>
