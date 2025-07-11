@@ -5,8 +5,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import CasualtyDetails from '@/components/CasualtyDetails';
 
-export default async function UserSingleReportPage(props: { params: { reportId: string } }) {
-  const params = await props.params;
+export default async function UserSingleReportPage({params}: { params: { reportId: string } }) {
   const reportId = params.reportId;
   const report = await prisma.report.findUnique({ 
     where: { id: reportId },

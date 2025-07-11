@@ -15,7 +15,7 @@ const DetailedReport: FC<Props> = ({ report }) => {
   return (
     <tr className="hover:bg-gray-50">
       <td className="px-4 py-2 whitespace-nowrap text-sm border text-black">
-        {new Date(report.reportedAt).toLocaleDateString()}
+        {new Date(report.createdAt as Date).toLocaleDateString()}
       </td>
       <td className="px-4 py-2 whitespace-nowrap text-sm border text-black">
         {new Date(report.incidentDate).toLocaleDateString()}
