@@ -1,3 +1,9 @@
+/* 
+1)add filteration, pagination in admin dashboard
+2)need to fix seed.ts to fix the ability to add more reports and casualties in database.
+3)add some phone number api, country dropdown api
+*/
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -5,6 +11,7 @@ import axios from 'axios';
 import { reportSchema } from '@/types';
 import z from 'zod';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 
 type ReportInput = z.infer<typeof reportSchema>; // raw data from backend
@@ -30,7 +37,6 @@ export default function ReportsPage() {
     area: ''
   }); */
 
-  // Mock data - replace with your API call
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -250,32 +256,83 @@ export default function ReportsPage() {
       
       {/* Incidents Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead className="bg-gray-50">
+        <table className="w-full text-left border border-gray-300 shadow-sm">
+          <thead className="bg-blue-100 text-black">
             <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Date & Time reported to DOCOMM</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Incident Date</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Ship's Name</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">IMO No.</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Flag</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Ship Type</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Incident Category</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase tracking-wider border">Number of Deaths</th>
+              <th className="px-4 py-3 border-b">Date reported to DGCOMM</th>
+              <th className="px-4 py-3 border-b">Incident Date</th>
+              <th className="px-4 py-3 border-b">Ship's Name</th>
+              <th className="px-4 py-3 border-b">IMO No.</th>
+              <th className="px-4 py-3 border-b">Flag</th>
+              <th className="px-4 py-3 border-b">Ship Type</th>
+              <th className="px-4 py-3 border-b">Category</th>
+              <th className="px-4 py-3 border-b">Deaths</th>
+              <th className="px-4 py-3 border-b">Injuries</th>
+              <th className="px-4 py-3 border-b">Area</th>
+              <th className="px-4 py-3 border-b">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
-            {reports.map((report) => (
-              <tr key={report.id} onClick={()=>{router.push(`/admin/${report.id}`)}} className="hover:bg-gray-50 cursor-pointer">
-                <td className="px-4 py-2 border text-black">{new Date(report.reportedAt as Date).toLocaleString()}</td>
-                <td className="px-4 py-2 border text-black">{new Date(report.incidentDate as Date).toLocaleString()}</td>
-                <td className="px-4 py-2 border text-black">{report.shipName}</td>
-                <td className="px-4 py-2 border text-black">{report.imoNumber}</td>
-                <td className="px-4 py-2 border text-black">{report.flag}</td>
-                <td className="px-4 py-2 border text-black">{report.shipType}</td>
-                <td className="px-4 py-2 border text-black">{report.incidentCategory}</td>
-                <td className="px-4 py-2 border text-black">{report.deaths}</td>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={11} className="text-center px-4 py-6 text-gray-600">
+                  Loading reports...
+                </td>
               </tr>
-            ))}
+            ) : reports.length === 0 ? (
+              <tr>
+                <td colSpan={11} className="text-center px-4 py-6 text-gray-600">
+                  No reports found.
+                </td>
+              </tr>
+            ) : (
+              reports.map((report) => (
+                <tr
+                  key={report.id}
+                  className="hover:bg-blue-50 transition cursor-pointer"
+                  onClick={() => router.push(`/admin/${report.id}`)}
+                >
+                  <td className="px-4 py-3 border-b">
+                    {new Date(report?.reportedAt as Date).toLocaleDateString()}<br/>
+                    <span className="text-xs text-gray-500">
+                      {new Date(report?.reportedAt as Date).toLocaleTimeString()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 border-b">
+                    {new Date(report.incidentDate).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3 border-b font-medium">{report.shipName}</td>
+                  <td className="px-4 py-3 border-b font-mono">{report.imoNumber}</td>
+                  <td className="px-4 py-3 border-b">{report.flag}</td>
+                  <td className="px-4 py-3 border-b">{report.shipType}</td>
+                  <td className="px-4 py-3 border-b">{report.incidentCategory}</td>
+                  <td className="px-4 py-3 border-b text-center">
+                    <span className={`inline-block w-6 h-6 rounded-full ${
+                      report.deaths > 0 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {report.deaths || 0}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 border-b text-center">
+                    <span className={`inline-block w-6 h-6 rounded-full ${
+                      report.injured > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {report.injured || 0}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 border-b">{report.areaOfIncident}</td>
+                  <td className="px-4 py-3 border-b">
+                    <Link href={`/admin/${report.id}`} className="text-blue-600 hover:text-blue-800 mr-2">
+                      View
+                    </Link>
+
+                    <Link href={`/admin/${report.id}/edit`} className="text-green-600 hover:text-green-800">
+                      Edit
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -293,3 +350,5 @@ export default function ReportsPage() {
                 <td className="px-4 py-2 whitespace-nowrap text-sm border text-black">{report.area}</td>
                 <td className="px-4 py-2 whitespace-nowrap text-sm border font-semibold text-black">{report.status}</td>
 */
+
+

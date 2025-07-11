@@ -1,15 +1,23 @@
 import { prisma } from '@/lib/prisma';
-import { reportSchema } from '@/types';
+import { reportSchema, IncidentClassification, IncidentConsequences } from '@/types';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import CasualtyDetails from '@/components/CasualtyDetails';
 
 export default async function UserSingleReportPage(props: { params: { reportId: string } }) {
   const params = props.params;
   const reportId = params.reportId;
-  const report = await prisma.report.findUnique({ where: { id: reportId } });
+  const report = await prisma.report.findUnique({ 
+    where: { id: reportId },
+    include: {
+      casualties: true
+    }
+  });
 
   if (!report) return notFound();
+  
   const validatedReport = reportSchema.parse(report);
+  const casualties = report.casualties;
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -22,10 +30,19 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-white border rounded-lg p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-white border rounded-lg p-6 mb-6">
+        {/* Incident Classification */}
+        <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2">
+          0. Broad Classification of Incidents
+        </h2>
+        <Info label="Incident Classification" value={validatedReport.incidentClassification} />
+        
+        {/* Ship/Reporting Information */}
+        <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2">
+          1. Ship & Reporting Information
+        </h2>
         <Info label="Created At" value={new Date(validatedReport.createdAt as Date).toLocaleString()} />
         <Info label="Updated At" value={new Date(validatedReport.updatedAt as Date).toLocaleString()} />
-        <Info label="Incident Classification" value={validatedReport.incidentClassification} />
         <Info label="Reported At" value={new Date(validatedReport.reportedAt as Date).toLocaleString()} />
         <Info label="Incident Date" value={new Date(validatedReport.incidentDate).toLocaleString()} />
         <Info label="Ship Name" value={validatedReport.shipName} />
@@ -51,6 +68,11 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
         <Info label="Hull & Machinery Underwriters" value={validatedReport.hullMachineryUnderwriters} />
         <Info label="Condition Loaded/Ballast" value={validatedReport.conditionLoadedBallast} />
         <Info label="Total Crew On Board" value={validatedReport.totalCrewOnBoard?.toString()} />
+
+        {/* Ownership/Management Information */}
+        <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">
+          2. Ownership & Management Information
+        </h2>
         <Info label="Ownership Type" value={validatedReport.ownershipType} />
         <Info label="Technical Manager Name" value={validatedReport.techManagerName} />
         <Info label="Technical Manager Address" value={validatedReport.techManagerAddress} />
@@ -75,11 +97,21 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
         <Info label="Local Contact Name" value={validatedReport.localAgencyContactName} />
         <Info label="Local Contact Phone" value={validatedReport.localAgencyContactPhone} />
         <Info label="Local Contact Email" value={validatedReport.localAgencyContactEmail} />
+
+        {/* Incident Details */}
+        <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">
+          3. Incident Details
+        </h2>
         <Info label="Severity of Incident" value={validatedReport.severityOfIncident} />
         <Info label="Incident Category" value={validatedReport.incidentCategory} />
-        <Info label="Incident Consequences" value={validatedReport.incidentConsequences.join(', ')} />
-        <Info label="Deaths" value={validatedReport.deaths.toString()} />
-        <Info label="Injured" value={validatedReport.injured.toString()} />
+        <Info 
+          label="Incident Consequences" 
+          value={Array.isArray(validatedReport.incidentConsequences) 
+            ? validatedReport.incidentConsequences.join(', ') 
+            : validatedReport.incidentConsequences} 
+        />
+        <Info label="Deaths" value={validatedReport.deaths?.toString()} />
+        <Info label="Injured" value={validatedReport.injured?.toString()} />
         <Info label="Sickness" value={validatedReport.sickness?.toString()} />
         <Info label="Desertion" value={validatedReport.desertion?.toString()} />
         <Info label="Man Overboard Survived" value={validatedReport.manOverboardSurvived?.toString()} />
@@ -87,6 +119,11 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
         <Info label="Summary of Incident" value={validatedReport.summaryIncident} />
         <Info label="Summary of Action" value={validatedReport.summaryAction} />
         <Info label="Lessons Learnt" value={validatedReport.lessonsLearnt} />
+
+        {/* Additional Information */}
+        <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">
+          4. Additional Information
+        </h2>
         <Info label="SAR Required" value={validatedReport.sarRequired ? 'Yes' : 'No'} />
         <Info label="Oil Pollution Extent" value={validatedReport.oilPollutionExtent} />
         <Info label="Oil Spilled Volume" value={validatedReport.oilSpilledVolume} />
@@ -98,18 +135,28 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
         <Info label="Contact Number" value={validatedReport.contactNumber} />
         <Info label="Last Updated By" value={validatedReport.lastUpdatedBy} />
         <Info label="Last Updated At" value={validatedReport.lastUpdatedAt ? new Date(validatedReport.lastUpdatedAt).toLocaleString() : '—'} />
-        <Info label="Media URLs" value={validatedReport.mediaUrls.length ? validatedReport.mediaUrls.join(', ') : '—'} />
-
+        <Info label="Media URLs" value={validatedReport.mediaUrls?.length ? validatedReport.mediaUrls.join(', ') : '—'} />
       </div>
+
+      {/* Render casualties if Personnel Matters is selected */}
+      {validatedReport.incidentConsequences?.includes(IncidentConsequences.PersonnelMatters) && (
+        <CasualtyDetails casualties={casualties} />
+      )}
     </div>
   );
 }
 
 function Info({ label, value }: { label: string; value?: string | string[] | boolean | null }) {
+  const displayValue = Array.isArray(value) 
+    ? value.join(', ') 
+    : typeof value === 'boolean'
+      ? value ? 'Yes' : 'No'
+      : value?.toString() || '—';
+    
   return (
     <div className="flex flex-col border-b pb-2">
       <span className="text-xs font-semibold text-gray-600">{label}</span>
-      <span className="text-sm text-black">{value?.toString() || '—'}</span>
+      <span className="text-sm text-black break-words">{displayValue}</span>
     </div>
   );
 }

@@ -4,8 +4,8 @@ import { z } from "zod";
 
 export enum IncidentClassification {
   // change the values after asking dad
-  Type1 = "Type1",
-  Type2 = "Type2"
+  MarineCasualty="Marine Casualty",
+  NonOperationalIncident="Non-operational Incidents"
 }
 
 export enum ShipType {

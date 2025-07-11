@@ -1,6 +1,10 @@
 import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
+/* 
+prevent admin from going to the user route
+*/
+
 const isPublicRoute = createRouteMatcher([
   '/',
   '/sign-in(.*)',

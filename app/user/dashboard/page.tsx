@@ -1,13 +1,5 @@
 'use client';
 
-/* 
-logic to implement here:
-loading state,
-
-when the fetcing is happening, render loading
-*/
-
-
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
@@ -52,7 +44,7 @@ export default function UserDashboard() {
         <table className="w-full text-left border border-gray-300 shadow-sm">
         <thead className="bg-blue-100 text-black">
             <tr>
-              <th className="px-4 py-3 border-b">Reported Date</th>
+              <th className="px-4 py-3 border-b">Date reported to DGCOMM </th>
               <th className="px-4 py-3 border-b">Incident Date</th>
               <th className="px-4 py-3 border-b">Ship's Name</th>
               <th className="px-4 py-3 border-b">IMO No.</th>
@@ -127,18 +119,13 @@ export default function UserDashboard() {
                     {report.areaOfIncident}
                   </td>
                   <td className="px-4 py-3 border-b">
-                    <button
-                      onClick={() => router.push(`/user/dashboard/${report.id}`)}
-                      className="text-blue-600 hover:text-blue-800 mr-2"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => router.push(`/user/dashboard/${report.id}/edit`)}
-                      className="text-green-600 hover:text-green-800"
-                    >
-                      Edit
-                    </button>
+                    <Link href={`/user/dashboard/${report.id}`} className="text-blue-600 hover:text-blue-800 mr-2">
+                    View
+                    </Link>
+
+                    <Link href={`/user/dashboard/${report.id}/edit`} className="text-green-600 hover:text-green-800">
+                    Edit
+                    </Link>
                   </td>
                 </tr>
               ))

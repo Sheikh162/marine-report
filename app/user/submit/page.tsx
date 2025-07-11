@@ -1,13 +1,17 @@
 'use client';
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { z } from 'zod';
 import { CasualtyForm }  from '@/components/CasualtyForm';
 import { reportSchema,Flag, ShipType, RegistrationType, LocationType, AreaType, Bunkers, ConditionType, OwnershipType, SeverityType, IncidentCategory, IncidentClassification, IncidentConsequences } from '@/types';
+import { CountrySelect } from '@/components/CountrySelect';
+import { PhoneField } from '@/components/PhoneField';
 
 type ReportInput = z.input<typeof reportSchema>;
 
@@ -27,11 +31,11 @@ export default function CreateReportForm() {
 
   const {register,handleSubmit,setValue,formState: { errors },control} =methods
   const broad = {
-    Type1: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+    MarineCasualty: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
             Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
             Ut enim ad minim veniam, quis nostrud exercitation ullamco.`,
     
-    Type2: `Duis aute irure dolor in reprehenderit in voluptate velit esse. 
+    NonOperationalIncident: `Duis aute irure dolor in reprehenderit in voluptate velit esse. 
             Cillum dolore eu fugiat nulla pariatur excepteur sint occaecat. 
             Cupidatat non proident, sunt in culpa qui officia deserunt.`
   };
@@ -39,6 +43,10 @@ export default function CreateReportForm() {
   const watchValues=useWatch({control})
   const watchIncidentClassification=useWatch({control,name:"incidentClassification"}) as IncidentClassification
 
+  const incidentKey = Object.keys(IncidentClassification).find(
+    (key) => IncidentClassification[key as keyof typeof IncidentClassification] === watchIncidentClassification
+  );
+  
   const [casualtyComponent,setCasualtyComponent]=useState(false)
   useEffect(() => {
     if (user?.id) {
@@ -80,7 +88,7 @@ export default function CreateReportForm() {
               errors={errors} 
             />
             <div>
-            {broad[watchIncidentClassification]}
+            {incidentKey && broad[incidentKey as keyof typeof broad]}
             </div>
           </div>
          
@@ -91,8 +99,10 @@ export default function CreateReportForm() {
           
           <FormField label="Ship Name" name="shipName" register={register} errors={errors} required />
           <FormField label="IMO Number" name="imoNumber" register={register} errors={errors} required />
-          
-          <DropdownField 
+
+        
+{/*           <CountrySelect control={control} name={'flag'} label={'Flag'} errors={errors} required/>
+ */}          <DropdownField 
             label="Flag" 
             name="flag" 
             options={Object.values(Flag)} 
@@ -190,29 +200,32 @@ export default function CreateReportForm() {
           
           <FormField required label="Technical Manager Name" name="techManagerName" register={register} errors={errors} />
           <FormField label="Technical Manager Address" name="techManagerAddress" register={register} errors={errors} />
-          <FormField required label="Technical Manager Phone" name="techManagerPhone" register={register} errors={errors} />
-          <FormField required label="Technical Manager Email" name="techManagerEmail" register={register} errors={errors} type="email" />
           
+          <PhoneField control={control} name="techManagerPhone" label="Technical Manager Phone" required errors={errors} />
+
+          <FormField required label="Technical Manager Email" name="techManagerEmail" register={register} errors={errors} type="email" />
+
+
           <FormField required label="DPA Name" name="dpaName" register={register} errors={errors} />
-          <FormField required label="DPA Phone" name="dpaPhone" register={register} errors={errors} />
-          <FormField required label="DPA Mobile" name="dpaMobile" register={register} errors={errors} />
+          <PhoneField control={control} name="dpaPhone" label="DPA Phone" required errors={errors} />
+          <PhoneField control={control} name="dpaMobile" label="DPA Mobile" required errors={errors} />
           <FormField required label="DPA Email" name="dpaEmail" register={register} errors={errors} type="email" />
           
           <FormField label="RPS Agency Name" name="rpsAgencyName" register={register} errors={errors} />
           <FormField label="RPS Agency Address" name="rpsAgencyAddress" register={register} errors={errors} />
-          <FormField label="RPS Agency Phone" name="rpsAgencyPhone" register={register} errors={errors} />
+          <PhoneField control={control} name="rpsAgencyPhone" label="RPS Agency Phone" errors={errors} />
           <FormField label="RPS Agency Email" name="rpsAgencyEmail" register={register} errors={errors} type="email" />
           <FormField label="RPS Agency Contact Name" name="rpsAgencyContactName" register={register} errors={errors} />
-          <FormField label="RPS Agency Contact Phone" name="rpsAgencyContactPhone" register={register} errors={errors} />
+          <PhoneField control={control} name="rpsAgencyContactPhone" label="RPS Agency Contact Phone" errors={errors} />
           <FormField label="RPS Agency Contact Email" name="rpsAgencyContactEmail" register={register} errors={errors} type="email" />
           <FormField label="RPSL Number" name="rpslNumber" register={register} errors={errors} />
           
           <FormField label="Local Agency Name" name="localAgencyName" register={register} errors={errors} />
           <FormField label="Local Agency Address" name="localAgencyAddress" register={register} errors={errors} />
-          <FormField label="Local Agency Phone" name="localAgencyPhone" register={register} errors={errors} />
+          <PhoneField control={control} name="localAgencyPhone" label="Local Agency Phone" errors={errors} />
           <FormField label="Local Agency Email" name="localAgencyEmail" register={register} errors={errors} type="email" />
           <FormField label="Local Agency Contact Name" name="localAgencyContactName" register={register} errors={errors} />
-          <FormField label="Local Agency Contact Phone" name="localAgencyContactPhone" register={register} errors={errors} />
+          <PhoneField control={control} name="localAgencyContactPhone" label="Local Agency Contact Phone" errors={errors} />
           <FormField label="Local Agency Contact Email" name="localAgencyContactEmail" register={register} errors={errors} type="email" />
 
           {/* Section 3: SEVERITY OF INCIDENT DATA */}
@@ -347,7 +360,7 @@ export default function CreateReportForm() {
           <FormField required label="Reported By" name="reportedBy" register={register} errors={errors} />
           <FormField required label="Company Name" name="companyName" register={register} errors={errors} />
           <FormField required label="Designation" name="designation" register={register} errors={errors} />
-          <FormField required label="Contact Number" name="contactNumber" register={register} errors={errors} />
+          <PhoneField control={control} name="contactNumber" label="Contact Number" required errors={errors} />
 
           {/* Submit Button */}
           <div className="col-span-full flex justify-end mt-4">
@@ -522,4 +535,3 @@ const CheckboxGroupField = ({
     </>
   );
 };
-

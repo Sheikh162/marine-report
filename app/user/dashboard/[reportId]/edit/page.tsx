@@ -69,11 +69,11 @@ export default function UpdateReportForm() {
   }) as IncidentConsequences[];
 
   const broad = {
-    [IncidentClassification.Type1]: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+    [IncidentClassification.MarineCasualty]: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
             Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
             Ut enim ad minim veniam, quis nostrud exercitation ullamco.`,
     
-    [IncidentClassification.Type2]: `Duis aute irure dolor in reprehenderit in voluptate velit esse. 
+    [IncidentClassification.NonOperationalIncident]: `Duis aute irure dolor in reprehenderit in voluptate velit esse. 
             Cillum dolore eu fugiat nulla pariatur excepteur sint occaecat. 
             Cupidatat non proident, sunt in culpa qui officia deserunt.`
   };
