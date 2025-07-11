@@ -50,28 +50,99 @@ export default function UserDashboard() {
 
       <div className="overflow-x-auto">
         <table className="w-full text-left border border-gray-300 shadow-sm">
-          <thead className="bg-blue-100 text-black">
+        <thead className="bg-blue-100 text-black">
             <tr>
-              <th className="px-4 py-3 border-b">Ship Name</th>
-              <th className="px-4 py-3 border-b">Incident Category</th>
+              <th className="px-4 py-3 border-b">Reported Date</th>
+              <th className="px-4 py-3 border-b">Incident Date</th>
+              <th className="px-4 py-3 border-b">Ship's Name</th>
+              <th className="px-4 py-3 border-b">IMO No.</th>
+              <th className="px-4 py-3 border-b">Flag</th>
+              <th className="px-4 py-3 border-b">Ship Type</th>
+              <th className="px-4 py-3 border-b">Category</th>
+              <th className="px-4 py-3 border-b">Deaths</th>
+              <th className="px-4 py-3 border-b">Injuries</th>
+              <th className="px-4 py-3 border-b">Area</th>
+              <th className="px-4 py-3 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {loading?"loading":reports.length===0?   
+            {loading ? (
               <tr>
-                <td colSpan={3} className="text-center px-4 py-6 text-gray-600">
+                <td colSpan={11} className="text-center px-4 py-6 text-gray-600">
+                  Loading reports...
+                </td>
+              </tr>
+            ) : reports.length === 0 ? (
+              <tr>
+                <td colSpan={11} className="text-center px-4 py-6 text-gray-600">
                   No reports found.
                 </td>
-              </tr>:reports.map((report) =>
-               (<tr
+              </tr>
+            ) : (
+              reports.map((report) => (
+                <tr
                   key={report.id}
                   className="hover:bg-blue-50 transition cursor-pointer"
                   onClick={() => router.push(`/user/dashboard/${report.id}`)}
                 >
-                  <td className="px-4 py-3 border-b">{report.shipName}</td>
-                  <td className="px-4 py-3 border-b">{report.incidentCategory}</td>
+                  <td className="px-4 py-3 border-b">
+                    {new Date(report?.createdAt as Date).toLocaleDateString()}<br/>
+                    <span className="text-xs text-gray-500">
+                      {new Date(report?.createdAt as Date).toLocaleTimeString()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 border-b">
+                    {new Date(report.incidentDate).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3 border-b font-medium">
+                    {report.shipName}
+                  </td>
+                  <td className="px-4 py-3 border-b font-mono">
+                    {report.imoNumber}
+                  </td>
+                  <td className="px-4 py-3 border-b">
+                    {report.flag}
+                  </td>
+                  <td className="px-4 py-3 border-b">
+                    {report.shipType}
+                  </td>
+                  <td className="px-4 py-3 border-b">
+                    {report.incidentCategory}
+                  </td>
+                  <td className="px-4 py-3 border-b text-center">
+                    <span className={`inline-block w-6 h-6 rounded-full ${
+                      report.deaths > 0 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {report.deaths || 0}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 border-b text-center">
+                    <span className={`inline-block w-6 h-6 rounded-full ${
+                      report.injured > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {report.injured || 0}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 border-b">
+                    {report.areaOfIncident}
+                  </td>
+                  <td className="px-4 py-3 border-b">
+                    <button
+                      onClick={() => router.push(`/user/dashboard/${report.id}`)}
+                      className="text-blue-600 hover:text-blue-800 mr-2"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => router.push(`/user/dashboard/${report.id}/edit`)}
+                      className="text-green-600 hover:text-green-800"
+                    >
+                      Edit
+                    </button>
+                  </td>
                 </tr>
-              ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

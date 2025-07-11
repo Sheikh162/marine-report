@@ -1,26 +1,25 @@
 // app/user/dashboard/[id]/page.tsx
 import { prisma } from '@/lib/prisma';
-import { Casualty, casualtySchema, reportSchema } from '@/types';
+import { Casualty, casualtySchema, reportSchema, IncidentClassification } from '@/types';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import CasualtyDetails from '@/components/CasualtyDetails';
 
 export default async function UserSingleReportPage(props: { params: { reportId: string } }) {
-  const params=await props.params
-  const reportId=params.reportId
+  const params = await props.params;
+  const reportId = params.reportId;
   const report = await prisma.report.findUnique({ 
-    where: { id:reportId },
-/*     include: {
-      casualties: true
-    } */
+    where: { id: reportId },
+    include:{
+      casualties:true
+    }
   });
-  const casualties= await prisma.casualty.findMany({where:{reportId:reportId}})
-
+  //const casualties = await prisma.casualty.findMany({ where: { reportId: reportId } });
 
   if (!report) return notFound();
+  const casualties=report.casualties
   
   const validatedReport = reportSchema.parse(report);
-  //const validatedCasualties=casualtySchema.parse(casualties)
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -36,14 +35,18 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-white border rounded-lg p-6 mb-6">
+        {/* Incident Classification */}
+        <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2">
+          0. Broad Classification of Incidents
+        </h2>
+        <Info label="Incident Classification" value={validatedReport.incidentClassification} />
+        
         {/* Ship/Reporting Information */}
         <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2">
-          1. Ship & Reporting Information
+          1. Ship & Reporting Informations
         </h2>
         <Info label="Ship Name" value={validatedReport.shipName} />
         <Info label="IMO Number" value={validatedReport.imoNumber} />
-        <Info label="Incident Date" value={validatedReport.incidentDate?.toLocaleString()} />
-        <Info label="Reported At" value={validatedReport.reportedAt?.toLocaleString()} />
         <Info label="Flag" value={validatedReport.flag} />
         <Info label="Ship Type" value={validatedReport.shipType} />
         <Info label="Registration Type" value={validatedReport.registrationType} />
@@ -65,6 +68,8 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
         <Info label="Hull & Machinery Underwriters" value={validatedReport.hullMachineryUnderwriters} />
         <Info label="Loaded/Ballast Condition" value={validatedReport.conditionLoadedBallast} />
         <Info label="Total Crew On Board" value={validatedReport.totalCrewOnBoard?.toString()} />
+        <Info label="Incident Date" value={validatedReport.incidentDate?.toLocaleString()} />
+        <Info label="Reported At" value={validatedReport.reportedAt?.toLocaleString()} />
 
         {/* Ownership/Management Information */}
         <h2 className="col-span-full text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">
@@ -101,15 +106,18 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
         </h2>
         <Info label="Severity of Incident" value={validatedReport.severityOfIncident} />
         <Info label="Incident Category" value={validatedReport.incidentCategory} />
-        <Info label="Incident Consequences" value={validatedReport.incidentConsequences} />
+        <Info 
+          label="Incident Consequences" 
+          value={validatedReport.incidentConsequences} 
+        />
         <Info label="Deaths" value={validatedReport.deaths?.toString()} />
         <Info label="Injuries" value={validatedReport.injured?.toString()} />
         <Info label="Sickness" value={validatedReport.sickness?.toString()} />
         <Info label="Desertion" value={validatedReport.desertion?.toString()} />
         <Info label="Man Overboard-Survived" value={validatedReport.manOverboardSurvived?.toString()} />
-        <Info label="Causal Factors" value={validatedReport.causalFactors} />
-        <Info label="Incident Summary" value={validatedReport.summaryIncident} />
+        <Info label="Brief Summary of Incident" value={validatedReport.summaryIncident} />
         <Info label="Actions Taken" value={validatedReport.summaryAction} />
+        <Info label="Causal Factors" value={validatedReport.causalFactors} />
         <Info label="Lessons Learnt" value={validatedReport.lessonsLearnt} />
 
         {/* Additional Information */}
@@ -121,24 +129,36 @@ export default async function UserSingleReportPage(props: { params: { reportId: 
         <Info label="Oil Spilled Volume" value={validatedReport.oilSpilledVolume} />
         <Info label="Weather Conditions" value={validatedReport.weatherConditions} />
         <Info label="Tidal Conditions" value={validatedReport.tidalConditions} />
+        <Info label="Media URLs" value={
+          Array.isArray(validatedReport.mediaUrls) 
+            ? validatedReport.mediaUrls.join(', ') 
+            : validatedReport.mediaUrls
+        } />
         <Info label="Reported By" value={validatedReport.reportedBy} />
         <Info label="Company Name" value={validatedReport.companyName} />
         <Info label="Designation" value={validatedReport.designation} />
         <Info label="Contact Number" value={validatedReport.contactNumber} />
-        <Info label="Media URLs" value={validatedReport.mediaUrls?.join(', ')} />
       </div>
 
       {/* Render casualties */}
-      <CasualtyDetails casualties={casualties} />
+      {validatedReport.incidentConsequences?.includes('Personnel Matters') && (
+        <CasualtyDetails casualties={casualties} />
+      )}
     </div>
   );
 }
 
-function Info({ label, value }: { label: string; value?: string |string[]| null }) {
+function Info({ label, value }: { label: string; value?: string | string[] | null }) {
+  const displayValue = Array.isArray(value) 
+    ? value.join(', ') 
+    : value?.toString() || '—';
+    
   return (
     <div className="flex flex-col border-b pb-2">
       <span className="text-xs font-semibold text-gray-600">{label}</span>
-      <span className="text-sm text-black">{value || '—'}</span>
+      <span className="text-sm text-black break-words">{displayValue}</span>
     </div>
   );
 }
+
+
