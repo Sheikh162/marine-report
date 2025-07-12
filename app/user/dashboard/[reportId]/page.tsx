@@ -6,7 +6,7 @@ import Link from 'next/link';
 import CasualtyDetails from '@/components/CasualtyDetails';
 
 export default async function UserSingleReportPage({params}: { params: { reportId: string } }) {
-  const reportId = await params.reportId;
+  const reportId = params.reportId;
   const report = await prisma.report.findUnique({ 
     where: { id: reportId },
     include:{
@@ -25,7 +25,7 @@ export default async function UserSingleReportPage({params}: { params: { reportI
       <div className='flex justify-between mb-4'>
         <h1 className="text-2xl font-bold text-black">Your Submitted Report</h1>
         <div className="">
-          <Link href={`/user/dashboard/${params.reportId}/edit`}>
+          <Link href={`/user/dashboard/${reportId}/edit`}>
             <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
               Edit
             </button>
