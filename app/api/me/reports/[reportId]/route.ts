@@ -5,9 +5,8 @@ import { reportSchema } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 
 
-export async function PUT(request: Request, props: { params: { reportId: string } }) {// this is the params im passing from frontend i guess
-  const params=await props.params
-  const reportId=params.reportId
+export async function PUT(request: Request, {params}: { params: Promise<{ reportId: string }> }) {// this is the params im passing from frontend i guess
+  const reportId=(await params).reportId
   // why dont we need userId? because reportId is unique for each report, so that is enough
 /*   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); */
@@ -114,9 +113,8 @@ export async function PUT(request: Request, props: { params: { reportId: string 
 // instead of using params, get the param passed by user
 
 //get a single report of a specific user    // this route has no purpose, since it is handles from server component /user/dashboard[reportId]
-export async function GET(_: Request, props : { params: { reportId: string } }) {
-  const params=await props.params
-  const reportId=params.reportId
+export async function GET(_: Request, {params}: { params: Promise<{ reportId: string }> }) {
+  const reportId=(await params).reportId
 
   //const { userId } = await auth();
   //if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
