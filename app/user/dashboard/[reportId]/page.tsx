@@ -5,8 +5,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import CasualtyDetails from '@/components/CasualtyDetails';
 
-export default async function UserSingleReportPage({params}: { params: { reportId: string } }) {
-  const reportId = params.reportId;
+export default async function UserSingleReportPage({params}: { params: Promise<{ reportId: string }> }) {
+  const reportId = (await params).reportId;
   const report = await prisma.report.findUnique({ 
     where: { id: reportId },
     include:{
