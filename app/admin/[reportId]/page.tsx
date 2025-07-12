@@ -1,11 +1,57 @@
+/* 
+[00:36:58.211] Running build in Washington, D.C., USA (East) – iad1
+[00:36:58.212] Build machine configuration: 2 cores, 8 GB
+[00:36:58.224] Cloning github.com/Sheikh162/marine-report (Branch: master, Commit: 805345e)
+[00:36:58.353] Previous build caches not available
+[00:36:58.963] Cloning completed: 739.000ms
+[00:36:59.247] Running "vercel build"
+[00:36:59.711] Vercel CLI 44.3.0
+[00:37:00.117] Installing dependencies...
+[00:37:15.450] 
+[00:37:15.451] added 194 packages in 15s
+[00:37:15.451] 
+[00:37:15.452] 31 packages are looking for funding
+[00:37:15.452]   run `npm fund` for details
+[00:37:15.496] Detected Next.js version: 15.3.4
+[00:37:15.500] Running "npm run build"
+[00:37:15.622] 
+[00:37:15.622] > marine-report@0.1.0 build
+[00:37:15.623] > next build
+[00:37:15.623] 
+[00:37:16.238] Attention: Next.js now collects completely anonymous telemetry regarding usage.
+[00:37:16.239] This information is used to shape Next.js' roadmap and prioritize features.
+[00:37:16.239] You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+[00:37:16.239] https://nextjs.org/telemetry
+[00:37:16.239] 
+[00:37:16.339]    ▲ Next.js 15.3.4
+[00:37:16.340] 
+[00:37:16.367]    Creating an optimized production build ...
+[00:37:30.538] <w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (149kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+[00:37:38.159]  ✓ Compiled successfully in 18.0s
+[00:37:38.166]    Linting and checking validity of types ...
+[00:37:44.304] Failed to compile.
+[00:37:44.305] 
+[00:37:44.305] app/admin/[reportId]/page.tsx
+[00:37:44.306] Type error: Type '{ params: { reportId: string; }; }' does not satisfy the constraint 'PageProps'.
+[00:37:44.306]   Types of property 'params' are incompatible.
+[00:37:44.306]     Type '{ reportId: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+[00:37:44.306] 
+[00:37:44.339] Next.js build worker exited with code: 1 and signal: null
+[00:37:44.361] Error: Command "npm run build" exited with 1
+[00:37:44.508] 
+[00:37:48.011] Exiting build container
+
+im getting failed deployment. whats the issue?give me solution
+*/
+
 import { prisma } from '@/lib/prisma';
 import { reportSchema, IncidentClassification, IncidentConsequences } from '@/types';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import CasualtyDetails from '@/components/CasualtyDetails';
 
-export default async function UserSingleReportPage({params}: { params: { reportId: string } }) {
-  const reportId = params.reportId;
+export default async function UserSingleReportPage({ params }: { params: { reportId: string } }) {
+  const reportId = await params.reportId;
   const report = await prisma.report.findUnique({ 
     where: { id: reportId },
     include: {
