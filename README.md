@@ -1,6 +1,6 @@
 # Marine Incident Reporting System
 
-A comprehensive web application for the Directorate General of Shipping (DGS) to manage and track marine casualties and incidents. This system provides a secure platform for maritime stakeholders to submit, view, and manage incident reports with detailed casualty information.
+A comprehensive web application for the Directorate General of Shipping,India (DGS) to manage and track marine casualties and incidents. This system provides a secure platform for maritime stakeholders to submit, view, and manage incident reports with detailed casualty information.
 
 ## 🚢 Project Overview
 
