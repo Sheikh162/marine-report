@@ -1,6 +1,6 @@
 # Marine Incident Reporting System
 
-A comprehensive web application for the Directorate General of Shipping (DGS) to manage and track marine casualties and incidents. This system provides a secure platform for maritime stakeholders to submit, view, and manage incident reports with detailed casualty information.
+A web application for the Directorate General of Shipping,India (DGS) to manage, track marine casualties and incidents. This system provides a secure platform for maritime stakeholders to submit, view, and manage incident reports with detailed casualty information.
 
 ## 🚢 Project Overview
 
@@ -188,23 +188,6 @@ Ensure all required environment variables are set in your deployment platform:
 - `CLERK_SECRET_KEY`: Clerk secret key
 - `CLERK_PUBLISHABLE_KEY`: Clerk publishable key
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
-## 📝 License
-
-This project is developed for the Directorate General of Shipping, Mumbai. All rights reserved.
-
-## 📞 Support
-
-For technical support or questions about the Marine Incident Reporting System, please contact the Directorate General of Shipping, Mumbai.
-
----
-
-**Built with ❤️ for maritime safety and compliance**
 

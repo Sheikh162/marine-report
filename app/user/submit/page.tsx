@@ -10,7 +10,6 @@ import axios from 'axios';
 import { z } from 'zod';
 import { CasualtyForm }  from '@/components/CasualtyForm';
 import { reportSchema,Flag, ShipType, RegistrationType, LocationType, AreaType, Bunkers, ConditionType, OwnershipType, SeverityType, IncidentCategory, IncidentClassification, IncidentConsequences } from '@/types';
-import { CountrySelect } from '@/components/CountrySelect';
 import { PhoneField } from '@/components/PhoneField';
 
 type ReportInput = z.input<typeof reportSchema>;
@@ -31,13 +30,8 @@ export default function CreateReportForm() {
 
   const {register,handleSubmit,setValue,formState: { errors },control} =methods
   const broad = {
-    MarineCasualty: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco.`,
-    
-    NonOperationalIncident: `Duis aute irure dolor in reprehenderit in voluptate velit esse. 
-            Cillum dolore eu fugiat nulla pariatur excepteur sint occaecat. 
-            Cupidatat non proident, sunt in culpa qui officia deserunt.`
+    MarineCasualty: `An incident involving damage to a ship, injury or loss of life, or environmental harm occurring during vessel operations.`,
+    NonOperationalIncident: `An event not directly related to ship operations but impacting personnel, equipment, or processes within the shipping department.`
   };
   
   const watchValues=useWatch({control})
@@ -147,7 +141,7 @@ export default function CreateReportForm() {
           />
           
           <FormField label="Deadweight" name="deadweight" register={register} errors={errors} />
-          <FormField label="Year Built" name="yearBuilt" register={register} errors={errors} type="number" />
+          <FormField label="Year Built" name="yearBuilt" register={register} errors={errors} type="date" />
           <FormField required label="Gross Tonnage (GT)" name="gt" register={register} errors={errors} />
           <FormField label="Draft Before" name="draftBefore" register={register} errors={errors} />
           <FormField label="Draft Aft" name="draftAft" register={register} errors={errors} />
