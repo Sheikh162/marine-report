@@ -69,13 +69,9 @@ export default function UpdateReportForm() {
   }) as IncidentConsequences[];
 
   const broad = {
-    [IncidentClassification.MarineCasualty]: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco.`,
+    [IncidentClassification.MarineCasualty]: `An incident involving damage to a ship, injury or loss of life, or environmental harm occurring during vessel operations.`,
     
-    [IncidentClassification.NonOperationalIncident]: `Duis aute irure dolor in reprehenderit in voluptate velit esse. 
-            Cillum dolore eu fugiat nulla pariatur excepteur sint occaecat. 
-            Cupidatat non proident, sunt in culpa qui officia deserunt.`
+    [IncidentClassification.NonOperationalIncident]: `An event not directly related to ship operations but impacting personnel, equipment, or processes within the shipping department.`
   };
 
   useEffect(() => {
@@ -180,7 +176,7 @@ export default function UpdateReportForm() {
           />
           
           <FormField label="Deadweight" name="deadweight" register={register} errors={errors} />
-          <FormField label="Year Built" name="yearBuilt" register={register} errors={errors} type="number" />
+          <FormField label="Year Built" name="yearBuilt" register={register} errors={errors} type="date" />
           <FormField required label="Gross Tonnage (GT)" name="gt" register={register} errors={errors} />
           <FormField label="Draft Before" name="draftBefore" register={register} errors={errors} />
           <FormField label="Draft Aft" name="draftAft" register={register} errors={errors} />

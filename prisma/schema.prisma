@@ -29,7 +29,7 @@ model Report {
   // textbox if outside indian ez do later
 
   deadweight              String?
-  yearBuilt               Int?
+  yearBuilt               DateTime?//Int?
   gt                      String
 
   draftBefore             String?

@@ -99,7 +99,7 @@ export default async function UserSingleReportPage({ params }: { params: Promise
         <Info label="Location of Vessel" value={validatedReport.locationOfVessel} />
         <Info label="Area of Incident" value={validatedReport.areaOfIncident} />
         <Info label="Deadweight" value={validatedReport.deadweight} />
-        <Info label="Year Built" value={validatedReport.yearBuilt?.toString()} />
+        <Info label="Year Built" value={new Date(validatedReport.yearBuilt as Date).toLocaleString()} />
         <Info label="Gross Tonnage (GT)" value={validatedReport.gt} />
         <Info label="Draft Before" value={validatedReport.draftBefore} />
         <Info label="Draft Aft" value={validatedReport.draftAft} />

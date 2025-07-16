@@ -1,6 +1,6 @@
 # Marine Incident Reporting System
 
-A comprehensive web application for the Directorate General of Shipping,India (DGS) to manage and track marine casualties and incidents. This system provides a secure platform for maritime stakeholders to submit, view, and manage incident reports with detailed casualty information.
+A web application for the Directorate General of Shipping,India (DGS) to manage, track marine casualties and incidents. This system provides a secure platform for maritime stakeholders to submit, view, and manage incident reports with detailed casualty information.
 
 ## 🚢 Project Overview
 
@@ -187,3 +187,10 @@ Ensure all required environment variables are set in your deployment platform:
 - `DATABASE_URL`: PostgreSQL connection string
 - `CLERK_SECRET_KEY`: Clerk secret key
 - `CLERK_PUBLISHABLE_KEY`: Clerk publishable key
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> test/deploy
