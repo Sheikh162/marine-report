@@ -1,5 +1,3 @@
-
-// src/components/ui/form/DatePickerField.tsx
 "use client"
 
 import * as React from "react"
@@ -19,9 +17,9 @@ import { FieldError } from "react-hook-form"
 
 interface DatePickerFieldProps {
     label: string;
-    date: any/* Date | undefined */;
+    date: any//Date | undefined;
     setDate: (date: Date | undefined) => void;
-    error?: FieldError;
+    error?: any//FieldError;
     required?: boolean;
     className?: string;
 }
@@ -45,10 +43,10 @@ export function DatePickerField({ label, date, setDate, error, required = false,
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
             <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            initialFocus
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                captionLayout="dropdown"
             />
         </PopoverContent>
         </Popover>

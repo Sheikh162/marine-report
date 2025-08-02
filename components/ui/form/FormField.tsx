@@ -28,7 +28,8 @@ export function FormField({
       <Label htmlFor={name} className={required ? "after:content-['*'] after:ml-0.5 after:text-destructive" : ''}>
         {label}
       </Label>
-      <Input type={type} id={name} {...register} />
+      <Input type={type} id={name} {...register} min={type === "number" ? "0" : undefined} // need to prevent -ve integers from being allowed
+      />
       {error && <p className="text-sm text-destructive">{error.message}</p>}
     </div>
   );

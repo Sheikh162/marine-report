@@ -20,6 +20,25 @@ import { Badge } from "@/components/ui/badge"
 type Report = z.infer<typeof reportSchema>
 
 export const columns: ColumnDef<Report>[] = [
+  {
+    accessorKey: "updatedAt",
+    //header: "Updated At",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Updated At
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+  },
+    cell: ({ row }) => {
+        const date = new Date(row.getValue("updatedAt"))
+        return <div>{date.toLocaleString('en-IN', {year: 'numeric',month: 'numeric',day: 'numeric',hour: '2-digit',minute: '2-digit',hour12: false})}</div>
+    }
+},  
     {
         accessorKey: "shipName",
         header: ({ column }) => {

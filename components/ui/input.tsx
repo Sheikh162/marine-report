@@ -2,6 +2,10 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+interface InputProps {
+  InputProps:React.ComponentProps<"input">
+}
+
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
     <input
@@ -19,3 +23,4 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 }
 
 export { Input }
+export type { InputProps }

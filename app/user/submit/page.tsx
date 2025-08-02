@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form/FormField';
 import { SelectField } from '@/components/ui/form/SelectField';
@@ -16,15 +15,12 @@ import { CheckboxField } from '@/components/ui/form/CheckboxField';
 import { CheckboxGroupField } from '@/components/ui/form/CheckboxGroupField';
 import { TextareaField } from '@/components/ui/form/TextareaField';
 import { PageHeader } from '@/components/ui/layout/PageHeader';
-//import { useToast } from "@/components/ui/use-toast"
-
 import { countryList } from '@/lib/countryList';
 import { AreaType, Bunkers, ConditionType, IncidentCategory, IncidentClassification, IncidentConsequences, LocationType, OwnershipType, RegistrationType, reportSchema, SeverityType, ShipType } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CasualtyForm } from '@/components/CasualtyForm';
 import { useUser } from '@clerk/nextjs';
 import { toast } from 'sonner';
-
 
 
 type ReportInput = z.input<typeof reportSchema>;
@@ -60,7 +56,6 @@ export default function SubmitPage() {
 // Property 'includes' does not exist on type '{}'.ts(2339) , fixthis error
   const onSubmit = async (data: ReportInput) => {
     console.log("formdata",data)
-    //console.log(getValues())
     setIsLoading(true);
     try {
       await axios.post('/api/me/reports', data);
