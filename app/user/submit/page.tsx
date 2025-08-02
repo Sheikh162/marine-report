@@ -23,6 +23,7 @@ import { AreaType, Bunkers, ConditionType, IncidentCategory, IncidentClassificat
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CasualtyForm } from '@/components/CasualtyForm';
 import { useUser } from '@clerk/nextjs';
+import { toast } from 'sonner';
 
 
 
@@ -63,6 +64,8 @@ export default function SubmitPage() {
     setIsLoading(true);
     try {
       await axios.post('/api/me/reports', data);
+      toast("The report has been submitted successfully.")
+
 /*       toast({
         title: "Success!",
         description: "Your report has been submitted successfully.",
@@ -71,6 +74,7 @@ export default function SubmitPage() {
       router.refresh();
     } catch (error) {
       console.error("Failed to submit report:", error);
+      toast("Failed to submit the report. Please try again.")
 /*       toast({
         title: "Error",
         description: "Failed to submit the report. Please try again.",

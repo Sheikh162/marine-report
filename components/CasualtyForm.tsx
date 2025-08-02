@@ -10,7 +10,8 @@ import {
   Education,
   IncidentSubCategory,
   casualtySchema,
-  Report
+  Report,
+  IncidentConsequences
 } from '@/types';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -19,36 +20,43 @@ import { FormField } from './ui/form/FormField';
 import { SelectField } from './ui/form/SelectField';
 import { DatePickerField } from './ui/form/DatePickerField';
 import { Trash2 } from 'lucide-react';
+import { useEffect } from 'react';
 
 type CasualtyInput = z.input<typeof casualtySchema>;
 
+// This is the full, correct default object for a new casualty.
+// It includes all required fields, satisfying the schema and fixing the error.
 const defaultCasualty: CasualtyInput = {
-    name: '',
-    status: CasualtyStatus.Injured,
-    incidentSubCategory: IncidentSubCategory.InjuryOnBoard,
-    nationality: Nationality.IN,
-    gender: Gender.Male,
-    residentialAddress: '',
-    dateOfBirth: undefined,
-    age: undefined,
-    rank: '',
-    dateOfJoining: undefined,
-    maritalStatus: MaritalStatus.Single,
-    education: Education.Tenth,
-    insuranceCover: '',
-    cdcNumber: '',
-    cdcPlaceOfIssue: '',
-    passportNumber: '',
-    passportPlaceOfIssue: '',
-    indosNumber: '',
-    cocNumber: '',
-    cocIssueDate: undefined,
-    cocPlaceOfIssue: '',
-    maritimeTraining: '',
-    collectiveBargaining: '',
-    nextOfKinDetails: '',
-    medicalReports: '',
-    mortalRemainsStatus: '',
+  name: '',
+  status: CasualtyStatus.Injured,
+  incidentSubCategory: IncidentSubCategory.InjuryOnBoard,
+  nationality: Nationality.IN,
+  gender: Gender.Male,
+  
+  // Newly added fields
+  age: null,
+  dateOfBirth: null,
+  
+  // Existing fields
+  residentialAddress: null,
+  rank: null,
+  dateOfJoining: null,
+  maritalStatus: MaritalStatus.Single,
+  education: Education.Tenth,
+  insuranceCover: null,
+  cdcNumber: null,
+  cdcPlaceOfIssue: null,
+  passportNumber: null,
+  passportPlaceOfIssue: null,
+  indosNumber: null,
+  cocNumber: null,
+  cocIssueDate: null,
+  cocPlaceOfIssue: null,
+  maritimeTraining: null,
+  collectiveBargaining: null,
+  nextOfKinDetails: null,
+  medicalReports: null,
+  mortalRemainsStatus: null,
 };
 
 export function CasualtyForm() {
@@ -69,7 +77,10 @@ export function CasualtyForm() {
         <h3 className="text-xl font-semibold">Casualty Details</h3>
         <Button
           type="button"
-          onClick={addCasualty}
+          onClick={()=>{
+            console.log("buttonn clicked")
+            addCasualty()
+          }}
         >
           Add Casualty
         </Button>
@@ -102,32 +113,12 @@ export function CasualtyForm() {
                     </div>
                 </div>
 
-                {/* Demographic Information - IMPROVED LAYOUT */}
+                {/* Demographic Information */}
                 <div className="space-y-4">
                     <h4 className="font-medium text-muted-foreground">Demographic Information</h4>
-                    {/* Using a more flexible grid with 6 columns on larger screens */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-start">
-                        <Controller 
-                            name={`casualties.${index}.dateOfBirth`} 
-                            control={control} 
-                            render={({ field }) => ( 
-                                <DatePickerField 
-                                    label="Date of Birth" 
-                                    date={field.value} 
-                                    setDate={field.onChange} 
-                                    error={errors.casualties?.[index]?.dateOfBirth}
-                                    className="lg:col-span-2" // Date picker takes more space
-                                /> 
-                            )} 
-                        />
-                        <FormField 
-                            label="Age" 
-                            name={`casualties.${index}.age`} 
-                            register={register(`casualties.${index}.age`, { valueAsNumber: true })} 
-                            error={errors.casualties?.[index]?.age} 
-                            type="number" 
-                            className="lg:col-span-1" // Age field takes less space
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-start">
+                        <Controller name={`casualties.${index}.dateOfBirth`} control={control} render={({ field }) => ( <DatePickerField label="Date of Birth" date={field.value} setDate={field.onChange} error={errors.casualties?.[index]?.dateOfBirth} className="lg:col-span-2" /> )} />
+                        <FormField label="Age" name={`casualties.${index}.age`} register={register(`casualties.${index}.age`, { valueAsNumber: true })} error={errors.casualties?.[index]?.age} type="number" className="lg:col-span-1" />
                         <Controller name={`casualties.${index}.maritalStatus`} control={control} render={({ field }) => ( <SelectField label="Marital Status" name={field.name} options={Object.values(MaritalStatus)} onValueChange={field.onChange} defaultValue={field.value} error={errors.casualties?.[index]?.maritalStatus} /> )} />
                         <Controller name={`casualties.${index}.gender`} control={control} render={({ field }) => ( <SelectField label="Gender" name={field.name} options={Object.values(Gender)} onValueChange={field.onChange} defaultValue={field.value} error={errors.casualties?.[index]?.gender} required /> )} />
                         <Controller name={`casualties.${index}.education`} control={control} render={({ field }) => ( <SelectField label="Education" name={field.name} options={Object.values(Education)} onValueChange={field.onChange} defaultValue={field.value} error={errors.casualties?.[index]?.education} /> )} />
@@ -169,3 +160,6 @@ export function CasualtyForm() {
     </div>
   );
 }
+
+
+

@@ -7,6 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ibmPlexMono, inter } from './font';
 import { ThemeProvider } from "@/components/ThemeProvider"; // Import the provider
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: 'Sheikh Abdullah - Portfolio',
@@ -66,6 +67,8 @@ export default function RootLayout({
             <main className="flex flex-col min-h-screen px-4 pt-20 md:px-8">
               {children}
             </main>
+
+            <Toaster/>
             <Footer />
           </ThemeProvider>
         </body>

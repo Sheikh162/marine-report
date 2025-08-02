@@ -63,42 +63,131 @@ export const casualtySchema = z.object({
   id: z.string().uuid().optional(),
   reportId: z.string().optional(),
 
+  // Required string fields
   incidentSubCategory: z.string(),
   name: z.string(),
-
   status: z.string(),
   nationality: z.string(),
-
-  residentialAddress: z.string().nullable().catch(null),
-  dateOfBirth: z.coerce.date().nullable().catch(null),
-  age: z.number().int().nullable().catch(null),
-  rank: z.string().nullable().catch(null),
-  dateOfJoining: z.coerce.date().nullable().catch(null),
-
-  maritalStatus: z.string().nullable().catch(null),
   gender: z.string(),
-  education: z.string().nullable().catch(null),
 
-  insuranceCover: z.string().nullable().catch(null),
-  cdcNumber: z.string().nullable().catch(null),
-  cdcPlaceOfIssue: z.string().nullable().catch(null),
-  passportNumber: z.string().nullable().catch(null),
-  passportPlaceOfIssue: z.string().nullable().catch(null),
-  indosNumber: z.string().nullable().catch(null),
-  cocNumber: z.string().nullable().catch(null),
+  // Nullable fields with proper undefined → null conversion
+  residentialAddress: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+  
+  // Age field (number)
+  age: z.number()
+    .int()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.number().int().nullable()),
+    
+  // Date of Birth field
+  dateOfBirth: z.coerce.date()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.date().nullable()),
+  
+  rank: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+  
+  // Nullable date fields
+  dateOfJoining: z.coerce.date()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.date().nullable()),
 
-  cocIssueDate: z.coerce.date().nullable().catch(null),
-  cocPlaceOfIssue: z.string().nullable().catch(null),
-  maritimeTraining: z.string().nullable().catch(null),
-  collectiveBargaining: z.string().nullable().catch(null),
-  nextOfKinDetails: z.string().nullable().catch(null),
-  medicalReports: z.string().nullable().catch(null),
-  mortalRemainsStatus: z.string().nullable().catch(null),
+  // Other nullable string fields
+  maritalStatus: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  education: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
 
+  // Documentation fields
+  insuranceCover: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  cdcNumber: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  cdcPlaceOfIssue: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  passportNumber: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  passportPlaceOfIssue: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  indosNumber: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  cocNumber: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+
+  // Additional date fields
+  cocIssueDate: z.coerce.date()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.date().nullable()),
+
+  // Remaining string fields
+  cocPlaceOfIssue: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  maritimeTraining: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  collectiveBargaining: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  nextOfKinDetails: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  medicalReports: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+    
+  mortalRemainsStatus: z.string()
+    .nullable()
+    .transform(val => val ?? null)
+    .pipe(z.string().nullable()),
+
+  // Timestamps
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
-
 
 export const reportSchema = z.object({
   id: z.string().uuid().optional(),
