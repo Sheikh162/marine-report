@@ -65,21 +65,11 @@ export default function SubmitPage() {
     try {
       await axios.post('/api/me/reports', data);
       toast("The report has been submitted successfully.")
-
-/*       toast({
-        title: "Success!",
-        description: "Your report has been submitted successfully.",
-      }); */
       router.push('/user/dashboard');
       router.refresh();
     } catch (error) {
       console.error("Failed to submit report:", error);
       toast("Failed to submit the report. Please try again.")
-/*       toast({
-        title: "Error",
-        description: "Failed to submit the report. Please try again.",
-        variant: "destructive",
-      }); */
     } finally {
       setIsLoading(false);
     }

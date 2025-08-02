@@ -93,7 +93,7 @@ export default function AdminEditPage() {
     try {
       await axios.put(`/api/me/reports/${reportId}`, data);
       toast.success("The report has been updated successfully.");
-      router.push('/user/dashboard');
+      router.push('/admin');
       router.refresh();
     } catch (error) {
       console.error("Failed to update report:", error);

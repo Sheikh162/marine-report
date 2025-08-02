@@ -7,8 +7,6 @@ import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import { useEffect } from "react"
-
 
 export function ThemeToggle() {
   const { setTheme } = useTheme()

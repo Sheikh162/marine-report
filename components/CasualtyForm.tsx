@@ -20,7 +20,6 @@ import { FormField } from './ui/form/FormField';
 import { SelectField } from './ui/form/SelectField';
 import { DatePickerField } from './ui/form/DatePickerField';
 import { Trash2 } from 'lucide-react';
-import { useEffect } from 'react';
 
 type CasualtyInput = z.input<typeof casualtySchema>;
 
