@@ -1,23 +1,24 @@
+// app/page.tsx
+import { Button } from "@/components/ui/button";
 import { SignedOut, SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white text-black px-6 sm:px-12 py-12 flex flex-col items-center justify-center font-sans">
-      <main className="max-w-3xl text-center flex flex-col items-center gap-8">
+    <main className="flex-grow flex flex-col items-center justify-center text-center p-6">
+      <div className="max-w-3xl flex flex-col items-center gap-8">
         <Image
-          src="https://www.dgshipping.gov.in/App_Themes/standard/images/logo.png" // Replace with your actual logo
+          src="https://www.dgshipping.gov.in/App_Themes/standard/images/logo.png"
           alt="Directorate General of Shipping Logo"
           width={100}
           height={100}
           className="rounded-lg"
           priority
         />
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
           Directorate General of Shipping
         </h1>
-        <p className="text-lg sm:text-xl text-gray-700">
+        <p className="text-lg sm:text-xl text-muted-foreground">
           Welcome to the official Marine Incident Reporting System. Submit, track,
           and review maritime casualties with ease.
         </p>
@@ -25,18 +26,11 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
           <SignedOut>
             <SignInButton>
-            <button className="border border-blue-600 text-blue-600 hover:bg-blue-100 font-medium text-sm sm:text-base px-6 py-3 rounded-full transition">
-              Report an incident
-            </button>
+              <Button>Report an incident</Button>
             </SignInButton>
           </SignedOut>
-
         </div>
-      </main>
-
-      <footer className="mt-16 text-sm text-gray-500 text-center">
-        © {new Date().getFullYear()} Directorate General of Shipping, Mumbai.
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }

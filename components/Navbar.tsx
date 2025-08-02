@@ -1,65 +1,86 @@
+// components/Navbar.tsx
 'use client'
 
 import {
   SignedOut,
   SignedIn,
   SignInButton,
-  SignUpButton,
   SignOutButton,
   UserButton,
 } from '@clerk/nextjs'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import { 
+  NavigationMenu, 
+  NavigationMenuItem, 
+  NavigationMenuLink, 
+  NavigationMenuList, 
+  navigationMenuTriggerStyle 
+} from '@/components/ui/navigation-menu'
+import { ThemeToggle } from './ThemeToggle'
 
 export const Navbar = () => {
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-blue-100 shadow-sm">
+    <header className="sticky top-0 z-50 bg-background border-b shadow-sm">
       <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
-        <Link href="/" className="text-lg font-semibold text-blue-700">
-{/*           DGS Reporting Portal
- */}          <Image
-                src="https://www.dgshipping.gov.in/App_Themes/standard/images/logo.png"
-                alt="DGS Logo"
-                width={30}
-                height={30}
-                className="rounded-lg"
-                priority
-              /> 
-{/*                       <Image
-                        src="https://www.dgshipping.gov.in/App_Themes/standard/images/logo.png" // Replace with your actual logo
-                        alt="DGS Logo"
-                        width={100}
-                        height={100}
-                        className="rounded-lg"
-                        priority
-                      /> */}
+        <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-foreground">
+          <Image
+            src="https://www.dgshipping.gov.in/App_Themes/standard/images/logo.png"
+            alt="DGS Logo"
+            width={30}
+            height={30}
+            priority
+          />
+{/*           <span>DGS Reporting</span> */}
         </Link>
 
-        <nav className="flex items-center gap-4">
-          <SignedOut>
-            <SignInButton>
-              <button className="bg-blue-600 text-white rounded-lg font-medium text-sm sm:text-base px-4 py-2 hover:bg-blue-700 transition">
-                Sign In
-              </button>
-            </SignInButton>
-          </SignedOut>
+        <NavigationMenu>
+          <NavigationMenuList>
+            <SignedOut>
+              <NavigationMenuItem>
+                <ThemeToggle/>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <SignInButton>
+                  <Button>Sign In</Button>
+                </SignInButton>
+              </NavigationMenuItem>
+            </SignedOut>
 
-          <SignedIn>
-            <UserButton
-              appearance={{
-                elements: {
-                  userButtonPopoverCard:
-                    'shadow-lg border border-gray-200 rounded-xl',
-                },
-              }}
-            />
-            <SignOutButton>
-              <button className="text-sm sm:text-base px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition">
-                Sign Out
-              </button>
-            </SignOutButton>
-          </SignedIn>
-        </nav>
+            <SignedIn>
+              <NavigationMenuItem>
+                <ThemeToggle/>
+              </NavigationMenuItem>
+{/*               <NavigationMenuItem>
+                <NavigationMenuLink href="/user/dashboard" className={navigationMenuTriggerStyle()}>
+                    Dashboard
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink href="/user/submit" className={navigationMenuTriggerStyle()}>
+                    Submit Report
+                </NavigationMenuLink>
+              </NavigationMenuItem> */}
+              <NavigationMenuItem>
+                <UserButton
+                  appearance={{
+                    elements: {
+                      userButtonPopoverCard: 'shadow-lg border rounded-xl',
+                    },
+                  }}
+                />
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <SignOutButton>
+                  <Button variant="outline">Sign Out</Button>
+                </SignOutButton>
+              </NavigationMenuItem>
+              
+            </SignedIn>
+          </NavigationMenuList>
+        </NavigationMenu>
+
       </div>
     </header>
   )

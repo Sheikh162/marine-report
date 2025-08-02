@@ -1,29 +1,75 @@
-import type { Metadata } from 'next'
+// src/app/layout.tsx
 import { ClerkProvider } from '@clerk/nextjs'
-import './globals.css'
-import { Navbar } from '@/components/Navbar'
-
+import type { Metadata } from 'next';
+import './globals.css';
+import { cn } from '@/lib/utils';
+import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
+import { ibmPlexMono, inter } from './font';
+import { ThemeProvider } from "@/components/ThemeProvider"; // Import the provider
 
 export const metadata: Metadata = {
-  title: 'Casualty Reporting Portal',
-  description: 'Submit and manage marine incident reports for DGS Mumbai.',
-}
+  title: 'Sheikh Abdullah - Portfolio',
+  description: 'Full-Stack Developer building modern, performant web applications.',
+};
+
+
+/* export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ClerkProvider>
+      <html lang="en" className="dark scroll-smooth" suppressHydrationWarning>
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans text-foreground antialiased",
+            inter.variable, 
+            ibmPlexMono.variable
+          )}
+        >
+          <Navbar />
+          <main className="flex flex-col min-h-screen px-4 pt-20 md:px-8">
+            {children}
+          </main>
+          <Footer />
+        </body>
+      </html>
+    </ClerkProvider>
+  );
+} */
+
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" className="scroll-smooth" suppressHydrationWarning>
         <body
-          className={`min-h-screen bg-gradient-to-b from-blue-50 to-white text-black `}
+          className={cn(
+            "min-h-screen bg-background font-sans text-foreground antialiased",
+            inter.variable, 
+            ibmPlexMono.variable
+          )}
         >
-          <Navbar />
-          <main className="max-w-6xl mx-auto p-4">{children}</main>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Navbar />
+            <main className="flex flex-col min-h-screen px-4 pt-20 md:px-8">
+              {children}
+            </main>
+            <Footer />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
-  )
+  );
 }

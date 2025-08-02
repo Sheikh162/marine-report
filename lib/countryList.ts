@@ -1,5 +1,5 @@
 // utils/countryList.ts
-export const countries = [
+export const countryList = [
     { label: "Afghanistan", value: "AF" },
     { label: "Albania", value: "AL" },
     { label: "Algeria", value: "DZ" },

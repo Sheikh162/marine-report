@@ -30,7 +30,9 @@ export async function GET() {
 export async function POST(request: Request) {  // new single report to be created
   try {
     const body = await request.json();
-    const parsed = reportSchema.safeParse(body);
+    const parsed = reportSchema.safeParse(body); // parsing error
+    console.log(body)
+    console.log(parsed)
 
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid data" }, { status: 400 });
@@ -41,6 +43,12 @@ export async function POST(request: Request) {  // new single report to be creat
     // Extract casualties and remove from safeData
     const { casualties = [], ...reportData } = safeData
 
+    /* 
+     Types of property 'userId' are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.ts(2322)
+    */
+    console.log(safeData)
     const report = await prisma.report.create({
       data: {
         ...reportData,
@@ -49,6 +57,8 @@ export async function POST(request: Request) {  // new single report to be creat
         },
       },
     });
+
+    console.log(report)
 
     return NextResponse.json(report);
   } catch (err) {
