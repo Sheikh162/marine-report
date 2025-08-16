@@ -3,7 +3,8 @@ import { z } from "zod";
 // enum for all selection menus
 export enum IncidentClassification {
   MarineCasualty="Marine Casualty",
-  NonOperationalIncident="Non-operational Incidents"
+  NonOperationalIncident="Non-operational Incidents",
+  Securityincident="Security Incident"
 }
 // ... (all your other enums like ShipType, RegistrationType, etc. remain here)
 export enum ShipType {
@@ -65,40 +66,21 @@ export const casualtySchema = z.object({
 
   // Required string fields
   incidentSubCategory: z.string(),
-  name: z.string(),
+  name: z.string().min(1, "Name is required").max(100, "Name cannot exceed 100 characters"),
   status: z.string(),
   nationality: z.string(),
   gender: z.string(),
 
   // Nullable fields with proper undefined → null conversion
-  residentialAddress: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
+  residentialAddress: z.string().max(200, "Address cannot exceed 200 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
   
   // Age field (number)
-  age: z.number()
-    .int()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.number().int().nullable()),
+  age: z.number().int().min(0, "Age cannot be negative").max(120, "Age cannot exceed 120").nullable().transform(val => val ?? null).pipe(z.number().int().nullable()),
     
   // Date of Birth field
-  dateOfBirth: z.coerce.date()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.date().nullable()),
-  
-  rank: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-  
-  // Nullable date fields
-  dateOfJoining: z.coerce.date()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.date().nullable()),
+  dateOfBirth: z.coerce.date().max(new Date(), "Date of birth cannot be in the future").nullable().transform(val => val ?? null).pipe(z.date().nullable()),
+  rank: z.string().max(50, "Rank cannot exceed 50 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  dateOfJoining: z.coerce.date().max(new Date(), "Date of joining cannot be in the future").nullable().transform(val => val ?? null).pipe(z.date().nullable()),
 
   // Other nullable string fields
   maritalStatus: z.string()
@@ -112,77 +94,22 @@ export const casualtySchema = z.object({
     .pipe(z.string().nullable()),
 
   // Documentation fields
-  insuranceCover: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  cdcNumber: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  cdcPlaceOfIssue: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  passportNumber: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  passportPlaceOfIssue: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  indosNumber: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  cocNumber: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
 
-  // Additional date fields
-  cocIssueDate: z.coerce.date()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.date().nullable()),
+  insuranceCover: z.string().max(100, "Insurance cover cannot exceed 100 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  cdcNumber: z.string().max(50, "CDC number cannot exceed 50 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  cdcPlaceOfIssue: z.string().max(100, "CDC place of issue cannot exceed 100 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  passportNumber: z.string().max(50, "Passport number cannot exceed 50 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  passportPlaceOfIssue: z.string().max(100, "Passport place of issue cannot exceed 100 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  indosNumber: z.string().max(50, "INDOS number cannot exceed 50 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  cocNumber: z.string().max(50, "COC number cannot exceed 50 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  cocIssueDate: z.coerce.date().max(new Date(), "COC issue date cannot be in the future").nullable().transform(val => val ?? null).pipe(z.date().nullable()),
+  cocPlaceOfIssue: z.string().max(100, "COC place of issue cannot exceed 100 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  maritimeTraining: z.string().max(200, "Maritime training cannot exceed 200 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  collectiveBargaining: z.string().max(200, "Collective bargaining cannot exceed 200 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  nextOfKinDetails: z.string().max(200, "Next of kin details cannot exceed 200 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  medicalReports: z.string().max(500, "Medical reports cannot exceed 500 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
+  mortalRemainsStatus: z.string().max(200, "Mortal remains status cannot exceed 200 characters").nullable().transform(val => val ?? null).pipe(z.string().nullable()),
 
-  // Remaining string fields
-  cocPlaceOfIssue: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  maritimeTraining: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  collectiveBargaining: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  nextOfKinDetails: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  medicalReports: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
-    
-  mortalRemainsStatus: z.string()
-    .nullable()
-    .transform(val => val ?? null)
-    .pipe(z.string().nullable()),
 
   // Timestamps
   createdAt: z.coerce.date().optional(),
@@ -201,7 +128,7 @@ export const reportSchema = z.object({
 
   incidentClassification: z.string().nullable().catch(null),
   shipName: z.string(),
-  imoNumber: z.string(),
+  imoNumber: z.string().length(7, "IMO number must be 7 digits"), // 7-digit restriction
 
   flag: z.string(), // required
   shipType: z.string(), // required
@@ -211,7 +138,16 @@ export const reportSchema = z.object({
   areaOfIncident: z.string().nullable().catch(null),
 
   deadweight: z.string().nullable().catch(null),
-  yearBuilt: z.coerce.date().optional(),//z.number().int().nullable().catch(null), // change this to date
+  //yearBuilt: z.coerce.date().optional(),//z.number().int().nullable().catch(null), // change this to date
+  //yearBuilt: z.coerce.number().int().min(1900).max(new Date().getFullYear()).nullable().catch(null),
+  yearBuilt: z.number()
+  .int()
+  .min(1900)
+  .max(new Date().getFullYear())
+  .nullable()
+  .transform(val => val ?? null)
+  .pipe(z.number().int().nullable()),
+  
   gt: z.string(),
   draftBefore: z.string().nullable().catch(null),
   draftAft: z.string().nullable().catch(null),

@@ -24,7 +24,6 @@ export async function PUT(request: Request, {params}: { params: Promise<{ report
     include: { casualties: true }
   });
 
-  console.log(parsed.data)
   if (!existing) {
     return NextResponse.json({ error: 'Not allowed' }, { status: 403 });
   }
@@ -35,6 +34,7 @@ export async function PUT(request: Request, {params}: { params: Promise<{ report
     where: { id: reportId },
     data: {
       ...restOfReport,
+      updatedAt: new Date(),
       casualties: {
         //deleteMany: {}, // optional: deletes all and recreates, or filter if needed
         update: casualties.filter(c => c.id)  // update has array of all casualty objects to be updated
@@ -104,11 +104,9 @@ export async function PUT(request: Request, {params}: { params: Promise<{ report
       casualties:true
     }
   })
+
   return NextResponse.json(updated);
 }
-
-// will updated consist of casualties array
-
 
 // instead of using params, get the param passed by user
 

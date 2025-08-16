@@ -1,7 +1,7 @@
 // app/user/submit/page.tsx
 'use client';
 
-import { useForm, Controller, FormProvider, } from 'react-hook-form';
+import { useForm, Controller, FormProvider, useFieldArray, } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
@@ -16,7 +16,7 @@ import { CheckboxGroupField } from '@/components/ui/form/CheckboxGroupField';
 import { TextareaField } from '@/components/ui/form/TextareaField';
 import { PageHeader } from '@/components/ui/layout/PageHeader';
 import { countryList } from '@/lib/countryList';
-import { AreaType, Bunkers, ConditionType, IncidentCategory, IncidentClassification, IncidentConsequences, LocationType, OwnershipType, RegistrationType, reportSchema, SeverityType, ShipType } from '@/types';
+import { AreaType, Bunkers, casualtySchema, CasualtyStatus, ConditionType, Education, Gender, IncidentCategory, IncidentClassification, IncidentConsequences, IncidentSubCategory, LocationType, MaritalStatus, Nationality, OwnershipType, RegistrationType, reportSchema, SeverityType, ShipType } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CasualtyForm } from '@/components/CasualtyForm';
 import { useUser } from '@clerk/nextjs';
@@ -25,9 +25,43 @@ import { toast } from 'sonner';
 
 type ReportInput = z.input<typeof reportSchema>;
 
+type CasualtyInput = z.input<typeof casualtySchema>;
+
+const defaultCasualty: CasualtyInput = {
+  name: '',
+  status: CasualtyStatus.Injured,
+  incidentSubCategory: IncidentSubCategory.InjuryOnBoard,
+  nationality: Nationality.IN,
+  gender: Gender.Male,
+  
+  // Newly added fields
+  age: null,
+  dateOfBirth: null,
+  
+  // Existing fields
+  residentialAddress: null,
+  rank: null,
+  dateOfJoining: null,
+  maritalStatus: MaritalStatus.Single,
+  education: Education.Tenth,
+  insuranceCover: null,
+  cdcNumber: null,
+  cdcPlaceOfIssue: null,
+  passportNumber: null,
+  passportPlaceOfIssue: null,
+  indosNumber: null,
+  cocNumber: null,
+  cocIssueDate: null,
+  cocPlaceOfIssue: null,
+  maritimeTraining: null,
+  collectiveBargaining: null,
+  nextOfKinDetails: null,
+  medicalReports: null,
+  mortalRemainsStatus: null,
+};
+
 export default function SubmitPage() {
   const router = useRouter();
-  //const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useUser();  
   const methods = useForm<ReportInput>({
@@ -45,6 +79,40 @@ export default function SubmitPage() {
   });
 
   const { register, handleSubmit, control, formState: { errors }, watch, getValues, setValue }=methods
+
+  // We now control the field array from the parent component
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "casualties",
+  });
+
+  // Watch the values of deaths and injured
+  const deaths = watch("deaths");
+  const injured = watch("injured");
+
+  // This useEffect is the core of the solution.
+  // It synchronizes the number of casualty forms with the death/injury count.
+  useEffect(() => {
+    const totalCasualties = (Number(deaths) || 0) + (Number(injured) || 0);
+    const currentCasualtyCount = fields.length;
+
+    if (totalCasualties > currentCasualtyCount) {
+      // Add new casualty forms if the total increases
+      const diff = totalCasualties - currentCasualtyCount;
+      for (let i = 0; i < diff; i++) {
+        // You should define a complete defaultCasualty object here or import it
+        append(defaultCasualty);
+      }
+    } else if (totalCasualties < currentCasualtyCount) {
+      // Remove casualty forms if the total decreases
+      const diff = currentCasualtyCount - totalCasualties;
+      const indicesToRemove = Array.from({ length: diff }, (_, i) => currentCasualtyCount - 1 - i);
+      remove(indicesToRemove);
+    }
+  }, [deaths, injured, fields.length, append, remove]);
+
+  //const showCasualtyComponent = (Number(deaths) || 0) + (Number(injured) || 0) > 0;
+
   useEffect(() => {
     if (user?.id) {
       setValue('userId', user.id);
@@ -57,14 +125,15 @@ export default function SubmitPage() {
   const onSubmit = async (data: ReportInput) => {
     console.log("formdata",data)
     setIsLoading(true);
+    const toastId = toast.loading("Updating report...");
     try {
       await axios.post('/api/me/reports', data);
-      toast("The report has been submitted successfully.")
+      toast.success("The report has been submitted successfully.",{id:toastId});
       router.push('/user/dashboard');
       router.refresh();
     } catch (error) {
       console.error("Failed to submit report:", error);
-      toast("Failed to submit the report. Please try again.")
+      toast.error("Failed to submit the report. Please try again.")
     } finally {
       setIsLoading(false);
     }
@@ -119,11 +188,10 @@ export default function SubmitPage() {
                 <Controller name="locationOfVessel" control={control} render={({ field }) => (<SelectField label="Location of Vessel" name="locationOfVessel" options={Object.values(LocationType)} onValueChange={field.onChange} defaultValue={field.value} error={errors.locationOfVessel} required />)} />
                 <Controller name="areaOfIncident" control={control} render={({ field }) => (<SelectField label="Area of Incident" name="areaOfIncident" options={Object.values(AreaType)} onValueChange={field.onChange} defaultValue={field.value} error={errors.areaOfIncident} />)} />
                 <FormField label="Deadweight" name="deadweight" register={register('deadweight')} error={errors.deadweight} type="number" />
-                <Controller name="yearBuilt" control={control} render={({ field }) => (<DatePickerField label="Year Built" date={field.value} setDate={field.onChange} error={errors.yearBuilt} />)} />
+                <FormField label="Year Built" name="yearBuilt" register={register('yearBuilt', { valueAsNumber: true })} error={errors.deadweight} type="number" />
                 <FormField label="Gross Tonnage (GT)" name="gt" register={register('gt')} error={errors.gt} required type="number" />
-                <FormField label="Draft Before" name="draftBefore" register={register('draftBefore')} error={errors.draftBefore} />
-                <FormField label="Draft Aft" name="draftAft" register={register('draftAft')} error={errors.draftAft} />
-                <FormField label="Freeboard" name="freeboard" register={register('freeboard')} error={errors.freeboard} />
+                <FormField label="Draft Before (in meters)" name="draftBefore" register={register('draftBefore')} error={errors.draftBefore} />
+                <FormField label="Draft Aft (in meters)" name="draftAft" register={register('draftAft')} error={errors.draftAft} />                <FormField label="Freeboard" name="freeboard" register={register('freeboard')} error={errors.freeboard} />
                 <FormField label="Cargo Type & Quantity" name="cargoTypeQty" register={register('cargoTypeQty')} error={errors.cargoTypeQty} required />
                 <Controller name="bunkers" control={control} render={({ field }) => (<SelectField label="Bunkers" name="bunkers" options={Object.values(Bunkers)} onValueChange={field.onChange} defaultValue={field.value} error={errors.bunkers} />)} />
                 <FormField label="Classification Society" name="classificationSociety" register={register('classificationSociety')} error={errors.classificationSociety} required />
@@ -167,7 +235,8 @@ export default function SubmitPage() {
                         <FormField label="Sickness" name="sickness" register={register('sickness', { valueAsNumber: true })} error={errors.sickness} type="number" />
                         <FormField label="Desertion" name="desertion" register={register('desertion', { valueAsNumber: true })} error={errors.desertion} type="number" />
                         <FormField label="Man Overboard-Survived" name="manOverboardSurvived" register={register('manOverboardSurvived', { valueAsNumber: true })} error={errors.manOverboardSurvived} type="number" />
-                        <div className="col-span-full"><CasualtyForm /></div>
+                        <div className="col-span-full"><CasualtyForm fields={fields} remove={remove} />
+                        </div>
                       </>
                     )}
                     
@@ -182,8 +251,8 @@ export default function SubmitPage() {
                 <CardHeader><CardTitle>4. Additional Information</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <Controller name="sarRequired" control={control} render={({ field }) => (<CheckboxField label="SAR Required" name="sarRequired" checked={field.value} onCheckedChange={field.onChange} error={errors.sarRequired} />)} />
-                    <FormField label="Oil Pollution Extent" name="oilPollutionExtent" register={register('oilPollutionExtent')} error={errors.oilPollutionExtent} />
-                    <FormField label="Oil Spilled Volume" name="oilSpilledVolume" register={register('oilSpilledVolume')} error={errors.oilSpilledVolume} type="number"/>
+                    <FormField label="Oil Pollution Extent (area of spread)" name="oilPollutionExtent" register={register('oilPollutionExtent')} error={errors.oilPollutionExtent} />
+                    <FormField label="Oil Spilled Volume (in cubic meters)" name="oilSpilledVolume" register={register('oilSpilledVolume')} error={errors.oilSpilledVolume} type="number"/>                    
                     <FormField label="Weather Conditions" name="weatherConditions" register={register('weatherConditions')} error={errors.weatherConditions} />
                     <FormField label="Tidal Conditions" name="tidalConditions" register={register('tidalConditions')} error={errors.tidalConditions} />
                     <FormField label="Media URLs (comma-separated)" name="mediaUrls" register={register('mediaUrls')} error={errors.mediaUrls} className="md:col-span-2 lg:col-span-3" />

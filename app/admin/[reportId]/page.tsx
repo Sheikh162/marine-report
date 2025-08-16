@@ -63,7 +63,7 @@
               <DetailItem label="Location of Vessel" value={validatedReport.locationOfVessel} />
               <DetailItem label="Area of Incident" value={validatedReport.areaOfIncident} />
               <DetailItem label="Deadweight" value={validatedReport.deadweight} />
-              <DetailItem label="Year Built" value={validatedReport.yearBuilt?.toLocaleDateString()} />
+              <DetailItem label="Year Built" value={validatedReport.yearBuilt?.toString()} />
               <DetailItem label="Gross Tonnage (GT)" value={validatedReport.gt} />
               <DetailItem label="Draft Before" value={validatedReport.draftBefore} />
               <DetailItem label="Draft Aft" value={validatedReport.draftAft} />
@@ -122,8 +122,8 @@
               <CardHeader><CardTitle>4. Additional Information</CardTitle></CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <DetailItem label="SAR Required" value={validatedReport.sarRequired?.toString()} />
-                  <DetailItem label="Oil Pollution Extent" value={validatedReport.oilPollutionExtent} />
-                  <DetailItem label="Oil Spilled Volume" value={validatedReport.oilSpilledVolume} />
+                  <DetailItem label="Oil Pollution Extent (area of spread)" value={validatedReport.oilPollutionExtent} />
+                  <DetailItem label="Oil Spilled Volume (in cubic meters)" value={validatedReport.oilSpilledVolume} />
                   <DetailItem label="Weather Conditions" value={validatedReport.weatherConditions} />
                   <DetailItem label="Tidal Conditions" value={validatedReport.tidalConditions} />
                   <DetailItem label="Reported By" value={validatedReport.reportedBy} />

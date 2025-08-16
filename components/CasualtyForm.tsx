@@ -1,7 +1,7 @@
 // components/CasualtyForm.tsx
 'use client';
 
-import { useFieldArray, useFormContext, Controller } from 'react-hook-form';
+import { useFieldArray, useFormContext, Controller, UseFieldArrayRemove } from 'react-hook-form';
 import { 
   CasualtyStatus,
   Nationality,
@@ -23,8 +23,6 @@ import { Trash2 } from 'lucide-react';
 
 type CasualtyInput = z.input<typeof casualtySchema>;
 
-// This is the full, correct default object for a new casualty.
-// It includes all required fields, satisfying the schema and fixing the error.
 const defaultCasualty: CasualtyInput = {
   name: '',
   status: CasualtyStatus.Injured,
@@ -58,38 +56,23 @@ const defaultCasualty: CasualtyInput = {
   mortalRemainsStatus: null,
 };
 
-export function CasualtyForm() {
-  const { control, register, formState: { errors } } = useFormContext<Report>();
-  
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'casualties',
-  });
+interface CasualtyFormProps {
+  fields: Record<"id", string>[];
+  remove: UseFieldArrayRemove;
+}
 
-  const addCasualty = () => {
-    append(defaultCasualty);
-  };
- 
+export function CasualtyForm({ fields, remove }: CasualtyFormProps) {
+
+  const { control, register, formState: { errors } } = useFormContext<Report>(); 
   return (
     <div className="space-y-6 col-span-full">
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold">Casualty Details</h3>
-        <Button
-          type="button"
-          onClick={()=>{
-            console.log("buttonn clicked")
-            addCasualty()
-          }}
-        >
-          Add Casualty
-        </Button>
-      </div>
+      <h3 className="text-xl font-semibold">Casualty Details</h3>
 
       {fields.map((field, index) => (
         <Card key={field.id} className="relative border-border">
             <CardHeader>
                 <CardTitle>Casualty #{index + 1}</CardTitle>
-                <Button
+{/*                 <Button
                     type="button"
                     variant="ghost"
                     size="icon"
@@ -97,7 +80,7 @@ export function CasualtyForm() {
                     className="absolute top-4 right-4 text-destructive hover:bg-destructive/10"
                 >
                     <Trash2 className="h-4 w-4" />
-                </Button>
+                </Button> */}
             </CardHeader>
             <CardContent className="space-y-6">
                 {/* Personal Information */}
@@ -159,6 +142,3 @@ export function CasualtyForm() {
     </div>
   );
 }
-
-
-

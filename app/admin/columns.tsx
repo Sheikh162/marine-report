@@ -17,6 +17,25 @@ import {
 
 export const columns: ColumnDef<Report>[] = [
   {
+    accessorKey: "createdAt",
+    //header: "created At",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Updated At
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+  },
+    cell: ({ row }) => {
+        const date = new Date(row.getValue("createdAt"))
+        return <div>{date.toLocaleString('en-IN', {year: 'numeric',month: 'numeric',day: 'numeric',hour: '2-digit',minute: '2-digit',hour12: false})}</div>
+    }
+},   
+  {
     accessorKey: "updatedAt",
     //header: "Updated At",
     header: ({ column }) => {
@@ -67,6 +86,23 @@ export const columns: ColumnDef<Report>[] = [
             return <div>{date.toLocaleDateString()}</div>
         }
     },
+
+    {
+      accessorKey: "flag",
+      header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Flag
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+      },
+      //header: "Flag",
+
+  },
     {
         accessorKey: "deaths",
         header: "Deaths",

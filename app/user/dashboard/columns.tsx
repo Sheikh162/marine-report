@@ -21,6 +21,53 @@ type Report = z.infer<typeof reportSchema>
 
 export const columns: ColumnDef<Report>[] = [
   {
+    accessorKey: "createdAt",
+    //header: "created At",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Created At
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+  },
+  cell: ({ row }) => {
+    const date = new Date(row.getValue("createdAt"));
+  
+    const local = date.toLocaleString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      //timeZoneName: "short",
+    });
+  
+    const utc = date.toLocaleString("en-GB", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+      timeZoneName: "short",
+    });
+  
+    return (
+      <div>
+        <div>{local}</div>
+        <div className="text-xs text-gray-500">{utc}</div>
+      </div>
+    );
+  }
+  
+},     
+{
     accessorKey: "updatedAt",
     //header: "Updated At",
     header: ({ column }) => {
@@ -34,10 +81,37 @@ export const columns: ColumnDef<Report>[] = [
         </Button>
       )
   },
-    cell: ({ row }) => {
-        const date = new Date(row.getValue("updatedAt"))
-        return <div>{date.toLocaleString('en-IN', {year: 'numeric',month: 'numeric',day: 'numeric',hour: '2-digit',minute: '2-digit',hour12: false})}</div>
-    }
+  cell: ({ row }) => {
+    const date = new Date(row.getValue("updatedAt"));
+  
+    const local = date.toLocaleString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      //timeZoneName: "short",
+    });
+  
+    const utc = date.toLocaleString("en-GB", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+      timeZoneName: "short",
+    });
+  
+    return (
+      <div>
+        <div>{local}</div>
+        <div className="text-xs text-gray-500">{utc}</div>
+      </div>
+    );
+  }
 },  
     {
         accessorKey: "shipName",
@@ -57,6 +131,22 @@ export const columns: ColumnDef<Report>[] = [
         accessorKey: "imoNumber",
         header: "IMO No.",
     },
+    {
+      accessorKey: "flag",
+      header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Flag
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+      },
+      //header: "Flag",
+
+  },
     {
         accessorKey: "incidentCategory",
         header: "Category",

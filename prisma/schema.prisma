@@ -25,19 +25,23 @@ model Report {
   registrationType        String?
   positionOfVessel        String
   locationOfVessel        String
+  //portName   String?           
   areaOfIncident          String?
-  // textbox if outside indian ez do later
+  //areaDescription String?
 
   deadweight              String?
-  yearBuilt               DateTime?//Int?
+  yearBuilt               Int? 
   gt                      String
 
   draftBefore             String?
   draftAft                String?
   freeboard               String?
 
+  //cargoType   String
+  //cargoQty  Int
   cargoTypeQty            String
   bunkers                 String?
+  //bunkersQty              Int?
   classificationSociety   String
   lastPortOfCall          String
   nextPortOfCall          String
